@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>どうぶつさんすう</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kosugi Maru', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FFE4F0 0%, #E8E0FF 50%, #D4F5E9 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ===== Floating Decorations ===== */
+    .floating-deco {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatAround 8s ease-in-out infinite;
+      font-size: 2rem;
+      opacity: 0.4;
+    }
+
+    .floating-deco:nth-child(1) { top: 8%; left: 5%; animation-delay: 0s; font-size: 2.5rem; }
+    .floating-deco:nth-child(2) { top: 15%; right: 8%; animation-delay: 1.5s; font-size: 1.8rem; }
+    .floating-deco:nth-child(3) { bottom: 20%; left: 10%; animation-delay: 3s; font-size: 2.2rem; }
+    .floating-deco:nth-child(4) { bottom: 10%; right: 12%; animation-delay: 4.5s; font-size: 2rem; }
+    .floating-deco:nth-child(5) { top: 40%; left: 3%; animation-delay: 2s; font-size: 1.5rem; }
+    .floating-deco:nth-child(6) { top: 60%; right: 5%; animation-delay: 5s; font-size: 1.8rem; }
+
+    @keyframes floatAround {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-15px) rotate(5deg); }
+      50% { transform: translateY(-8px) rotate(-3deg); }
+      75% { transform: translateY(-20px) rotate(3deg); }
+    }
+
+    /* ===== Screen Container ===== */
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 500px;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ===== Card ===== */
+    .card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(180, 140, 200, 0.2);
+      text-align: center;
+    }
+
+    /* ===== Start Screen ===== */
+    .start-title {
+      font-size: 2.2rem;
+      color: #7B5EA7;
+      margin-bottom: 0.3rem;
+      text-shadow: 2px 2px 0 rgba(255, 182, 193, 0.4);
+    }
+
+    .start-subtitle {
+      font-size: 1rem;
+      color: #B08DC5;
+      margin-bottom: 1.5rem;
+    }
+
+    .start-animals {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .start-animals span {
+      animation: bounce 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    .start-animals span:nth-child(1) { animation-delay: 0s; }
+    .start-animals span:nth-child(2) { animation-delay: 0.2s; }
+    .start-animals span:nth-child(3) { animation-delay: 0.4s; }
+    .start-animals span:nth-child(4) { animation-delay: 0.6s; }
+    .start-animals span:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* ===== Buttons ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, #FFB6C1, #DDA0DD);
+      color: white;
+      border: none;
+      padding: 1rem 3rem;
+      font-size: 1.5rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(221, 160, 221, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(221, 160, 221, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.95);
+    }
+
+    /* ===== Game Screen ===== */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+
+    .level-badge {
+      background: linear-gradient(135deg, #FFEAA7, #FDCB6E);
+      color: #856404;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .progress-text {
+      color: #7B5EA7;
+      font-size: 0.9rem;
+    }
+
+    .streak-badge {
+      background: linear-gradient(135deg, #FF9A9E, #FECFEF);
+      color: #C0392B;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      transition: transform 0.3s;
+    }
+
+    .streak-badge.pulse {
+      animation: pulse 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Progress Bar */
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #F0E6FF;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFB6C1, #DDA0DD, #87CEEB);
+      border-radius: 6px;
+      transition: width 0.5s ease;
+    }
+
+    /* Question */
+    .question-area {
+      margin-bottom: 1.5rem;
+    }
+
+    .question-text {
+      font-size: 2.5rem;
+      color: #5B3A7A;
+      margin-bottom: 0.5rem;
+      min-height: 3.5rem;
+    }
+
+    .question-operator {
+      color: #E056A0;
+    }
+
+    /* Choices */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+
+    .choice-btn {
+      background: white;
+      border: 3px solid #E8D5F5;
+      padding: 1rem;
+      font-size: 1.8rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #5B3A7A;
+    }
+
+    .choice-btn:hover {
+      border-color: #DDA0DD;
+      background: #FFF5FF;
+      transform: scale(1.03);
+    }
+
+    .choice-btn:active {
+      transform: scale(0.97);
+    }
+
+    .choice-btn.correct {
+      background: #D4EDDA;
+      border-color: #81C784;
+      color: #2E7D32;
+      animation: correctPop 0.5s ease;
+    }
+
+    .choice-btn.wrong {
+      background: #FFE0E0;
+      border-color: #EF9A9A;
+      color: #C62828;
+      animation: shake 0.4s ease;
+    }
+
+    .choice-btn.show-correct {
+      background: #D4EDDA;
+      border-color: #81C784;
+      color: #2E7D32;
+    }
+
+    .choice-btn:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    @keyframes correctPop {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-4px); }
+    }
+
+    /* Hint */
+    .hint-btn {
+      background: linear-gradient(135deg, #87CEEB, #98D8C8);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      transition: transform 0.2s;
+    }
+
+    .hint-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .hint-area {
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .hint-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+
+    .hint-animal {
+      font-size: 1.8rem;
+      display: inline-block;
+      animation: popIn 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .hint-animal.crossed {
+      position: relative;
+    }
+
+    .hint-animal.crossed::after {
+      content: '✕';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #E74C3C;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0); }
+      60% { transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Feedback */
+    .feedback {
+      font-size: 1.3rem;
+      min-height: 2rem;
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+
+    .feedback.correct-msg {
+      color: #2E7D32;
+    }
+
+    .feedback.wrong-msg {
+      color: #E056A0;
+    }
+
+    /* Level up notification */
+    .level-notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, #FFEAA7, #FDCB6E);
+      color: #856404;
+      padding: 1.5rem 2.5rem;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(253, 203, 110, 0.5);
+      pointer-events: none;
+    }
+
+    .level-notification.show {
+      animation: levelUp 1.5s ease forwards;
+    }
+
+    @keyframes levelUp {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    }
+
+    /* ===== Result Screen ===== */
+    .result-score {
+      font-size: 3rem;
+      color: #7B5EA7;
+      margin: 0.5rem 0;
+    }
+
+    .result-score .score-num {
+      font-size: 4rem;
+      color: #E056A0;
+    }
+
+    .result-label {
+      font-size: 1.1rem;
+      color: #B08DC5;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-level {
+      font-size: 1.2rem;
+      color: #856404;
+      background: linear-gradient(135deg, #FFEAA7, #FDCB6E);
+      display: inline-block;
+      padding: 0.3rem 1.2rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .stars {
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+
+    .stars .star {
+      display: inline-block;
+      animation: starPop 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .stars .star:nth-child(1) { animation-delay: 0.3s; }
+    .stars .star:nth-child(2) { animation-delay: 0.6s; }
+    .stars .star:nth-child(3) { animation-delay: 0.9s; }
+
+    @keyframes starPop {
+      0% { opacity: 0; transform: scale(0) rotate(-30deg); }
+      60% { transform: scale(1.3) rotate(10deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    .result-message {
+      font-size: 1.2rem;
+      color: #7B5EA7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .start-title { font-size: 1.8rem; }
+      .question-text { font-size: 2rem; }
+      .choice-btn { font-size: 1.5rem; padding: 0.8rem; }
+      .card { padding: 1.5rem 1rem; }
+      .hint-animal { font-size: 1.5rem; }
+    }
+
+    @media (min-width: 768px) {
+      .card { padding: 2.5rem 2rem; }
+      .question-text { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Decorations -->
+  <div class="floating-deco">⭐</div>
+  <div class="floating-deco">🌸</div>
+  <div class="floating-deco">☁️</div>
+  <div class="floating-deco">🌈</div>
+  <div class="floating-deco">💫</div>
+  <div class="floating-deco">🦋</div>
+
+  <!-- Level Up Notification -->
+  <div class="level-notification" id="levelNotification"></div>
+
+  <!-- Confetti Container -->
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <!-- ===== Start Screen ===== -->
+  <div class="screen active" id="startScreen">
+    <div class="card">
+      <h1 class="start-title">どうぶつさんすう</h1>
+      <p class="start-subtitle">たしざん と ひきざん をたのしくまなぼう！</p>
+      <div class="start-animals">
+        <span>🐱</span>
+        <span>🐶</span>
+        <span>🐰</span>
+        <span>🐻</span>
+        <span>🐼</span>
+      </div>
+      <button class="btn-primary" id="startBtn">はじめる！</button>
+    </div>
+  </div>
+
+  <!-- ===== Game Screen ===== -->
+  <div class="screen" id="gameScreen">
+    <div class="card">
+      <div class="game-header">
+        <span class="level-badge" id="levelBadge">レベル 1</span>
+        <span class="progress-text" id="progressText">1 / 30</span>
+        <span class="streak-badge" id="streakBadge">🔥 0 れんぞく</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+
+      <div class="question-area">
+        <div class="question-text" id="questionText"></div>
+      </div>
+
+      <div class="choices-grid" id="choicesGrid"></div>
+
+      <button class="hint-btn" id="hintBtn">💡 ヒント</button>
+      <div class="hint-area" id="hintArea"></div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- ===== Result Screen ===== -->
+  <div class="screen" id="resultScreen">
+    <div class="card">
+      <p class="result-label">けっか はっぴょう！</p>
+      <div class="result-score">
+        <span class="score-num" id="finalScore">0</span>
+        <span> / 30</span>
+      </div>
+      <div class="result-level" id="finalLevel">さいこうレベル: 1</div>
+      <div class="stars" id="stars"></div>
+      <p class="result-message" id="resultMessage"></p>
+      <button class="btn-primary" id="retryBtn">もういちど！</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== Constants =====
+    const TOTAL_QUESTIONS = 30;
+    const LEVEL_UP_STREAK = 10;
+    const LEVEL_DOWN_THRESHOLD = 4; // 直近5問中この数以上不正解でレベルダウン
+    const LEVEL_DOWN_WINDOW = 5;
+    const MAX_LEVEL = 5;
+    const MIN_LEVEL = 1;
+
+    const ANIMALS = ['🐱', '🐶', '🐰', '🐻', '🐼', '🐨', '🦊', '🐸', '🐷', '🐮'];
+
+    const LEVEL_CONFIG = [
+      null, // index 0 unused
+      { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },   // Lv1: 1~10 足し引き
+      { maxNum: 20, maxAnswer: 20, ops: ['+', '-'] },   // Lv2: 1~20 足し引き
+      { maxNum: 50, maxAnswer: 50, ops: ['+', '-'] },   // Lv3: 1~50 足し引き
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] }, // Lv4: 1~100 足し引き
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] }, // Lv5: 1~100 繰り上がり繰り下がりあり
+    ];
+
+    // ===== Game State =====
+    function createInitialState() {
+      return {
+        currentQuestion: 0,
+        score: 0,
+        level: 1,
+        maxLevel: 1,
+        streak: 0,
+        recentResults: [], // 直近5問の正誤記録
+        correctAnswer: 0,
+        num1: 0,
+        num2: 0,
+        operator: '+',
+        isAnswered: false,
+      };
+    }
+
+    let state = createInitialState();
+
+    // ===== DOM Elements =====
+    const startScreen = document.getElementById('startScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const startBtn = document.getElementById('startBtn');
+    const levelBadge = document.getElementById('levelBadge');
+    const progressText = document.getElementById('progressText');
+    const streakBadge = document.getElementById('streakBadge');
+    const progressBar = document.getElementById('progressBar');
+    const questionText = document.getElementById('questionText');
+    const choicesGrid = document.getElementById('choicesGrid');
+    const hintBtn = document.getElementById('hintBtn');
+    const hintArea = document.getElementById('hintArea');
+    const feedback = document.getElementById('feedback');
+    const levelNotification = document.getElementById('levelNotification');
+    const confettiContainer = document.getElementById('confettiContainer');
+    const finalScore = document.getElementById('finalScore');
+    const finalLevel = document.getElementById('finalLevel');
+    const stars = document.getElementById('stars');
+    const resultMessage = document.getElementById('resultMessage');
+    const retryBtn = document.getElementById('retryBtn');
+
+    // ===== Screen Management =====
+    function showScreen(screen) {
+      [startScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+    }
+
+    // ===== Random Utilities =====
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffleArray(arr) {
+      const result = [...arr];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    // ===== Question Generation =====
+    function generateQuestion(level) {
+      const config = LEVEL_CONFIG[level];
+      const op = config.ops[Math.floor(Math.random() * config.ops.length)];
+
+      let a, b, answer;
+
+      if (level === 5) {
+        // レベル5: 繰り上がり・繰り下がりを含む問題を優先
+        if (op === '+') {
+          // 繰り上がり: 一の位の合計が10以上
+          a = randInt(1, config.maxNum - 1);
+          const minB = Math.max(1, 10 - (a % 10));
+          const maxB = Math.min(config.maxNum, config.maxAnswer - a);
+          if (minB <= maxB) {
+            b = randInt(minB, maxB);
+          } else {
+            b = randInt(1, Math.min(config.maxNum, config.maxAnswer - a));
+          }
+          answer = a + b;
+        } else {
+          // 繰り下がり: a の一の位 < b の一の位
+          a = randInt(11, config.maxNum);
+          const minB = Math.max(1, (a % 10) + 1);
+          const maxB = Math.min(a, config.maxNum);
+          if (minB <= maxB) {
+            b = randInt(minB, maxB);
+          } else {
+            b = randInt(1, a);
+          }
+          answer = a - b;
+        }
+      } else {
+        if (op === '+') {
+          a = randInt(1, config.maxNum - 1);
+          b = randInt(1, Math.min(config.maxNum, config.maxAnswer - a));
+          answer = a + b;
+        } else {
+          a = randInt(2, config.maxNum);
+          b = randInt(1, a);
+          answer = a - b;
+        }
+      }
+
+      return { num1: a, num2: b, operator: op, answer };
+    }
+
+    // ===== Choices Generation =====
+    function generateChoices(correctAnswer, maxAnswer) {
+      const choices = new Set([correctAnswer]);
+
+      const range = maxAnswer <= 10 ? 3 : maxAnswer <= 20 ? 5 : 10;
+
+      let attempts = 0;
+      while (choices.size < 4 && attempts < 100) {
+        const offset = randInt(1, range) * (Math.random() < 0.5 ? 1 : -1);
+        const wrong = correctAnswer + offset;
+        if (wrong >= 0 && wrong <= maxAnswer && !choices.has(wrong)) {
+          choices.add(wrong);
+        }
+        attempts++;
+      }
+
+      // フォールバック: 足りない場合は順番に埋める
+      let fill = 0;
+      while (choices.size < 4) {
+        if (!choices.has(fill) && fill >= 0 && fill <= maxAnswer) {
+          choices.add(fill);
+        }
+        fill++;
+      }
+
+      return shuffleArray([...choices]);
+    }
+
+    // ===== Hint Display =====
+    function showHint() {
+      hintBtn.style.display = 'none';
+      hintArea.innerHTML = '';
+
+      const animalA = ANIMALS[randInt(0, ANIMALS.length - 1)];
+      let animalB = ANIMALS[randInt(0, ANIMALS.length - 1)];
+      while (animalB === animalA) {
+        animalB = ANIMALS[randInt(0, ANIMALS.length - 1)];
+      }
+
+      if (state.operator === '+') {
+        // 足し算: num1個のanimalA + num2個のanimalB
+        const row1 = document.createElement('div');
+        row1.className = 'hint-row';
+        for (let i = 0; i < state.num1; i++) {
+          const span = document.createElement('span');
+          span.className = 'hint-animal';
+          span.textContent = animalA;
+          span.style.animationDelay = `${i * 0.1}s`;
+          row1.appendChild(span);
+        }
+        hintArea.appendChild(row1);
+
+        const plus = document.createElement('div');
+        plus.style.fontSize = '1.5rem';
+        plus.style.color = '#E056A0';
+        plus.style.fontWeight = 'bold';
+        plus.textContent = '＋';
+        hintArea.appendChild(plus);
+
+        const row2 = document.createElement('div');
+        row2.className = 'hint-row';
+        for (let i = 0; i < state.num2; i++) {
+          const span = document.createElement('span');
+          span.className = 'hint-animal';
+          span.textContent = animalB;
+          span.style.animationDelay = `${(state.num1 + i) * 0.1}s`;
+          row2.appendChild(span);
+        }
+        hintArea.appendChild(row2);
+      } else {
+        // 引き算: num1個表示して num2個にバツ
+        const row = document.createElement('div');
+        row.className = 'hint-row';
+        for (let i = 0; i < state.num1; i++) {
+          const span = document.createElement('span');
+          span.className = 'hint-animal';
+          if (i >= state.num1 - state.num2) {
+            span.classList.add('crossed');
+          }
+          span.textContent = animalA;
+          span.style.animationDelay = `${i * 0.1}s`;
+          row.appendChild(span);
+        }
+        hintArea.appendChild(row);
+      }
+    }
+
+    // ===== Level Adjustment =====
+    function checkLevelChange(isCorrect) {
+      const prevLevel = state.level;
+
+      // レベルアップ: 10問連続正解
+      if (isCorrect && state.streak >= LEVEL_UP_STREAK && state.level < MAX_LEVEL) {
+        state.level = Math.min(state.level + 1, MAX_LEVEL);
+        state.streak = 0;
+        state.maxLevel = Math.max(state.maxLevel, state.level);
+      }
+
+      // レベルダウン: 直近5問中4問以上不正解
+      if (state.recentResults.length >= LEVEL_DOWN_WINDOW) {
+        const recentWindow = state.recentResults.slice(-LEVEL_DOWN_WINDOW);
+        const wrongCount = recentWindow.filter(r => !r).length;
+        if (wrongCount >= LEVEL_DOWN_THRESHOLD && state.level > MIN_LEVEL) {
+          state.level = Math.max(state.level - 1, MIN_LEVEL);
+          state.recentResults = []; // リセット
+        }
+      }
+
+      if (state.level !== prevLevel) {
+        showLevelNotification(state.level, state.level > prevLevel);
+      }
+    }
+
+    function showLevelNotification(level, isUp) {
+      const emoji = isUp ? '⬆️' : '⬇️';
+      const text = isUp ? 'レベルアップ！' : 'レベルダウン';
+      levelNotification.textContent = `${emoji} ${text} レベル ${level}`;
+      levelNotification.classList.remove('show');
+      void levelNotification.offsetWidth; // reflow
+      levelNotification.classList.add('show');
+    }
+
+    // ===== Answer Handler =====
+    function handleAnswer(selected, btnElement) {
+      if (state.isAnswered) return;
+      state.isAnswered = true;
+
+      const buttons = choicesGrid.querySelectorAll('.choice-btn');
+      buttons.forEach(btn => { btn.disabled = true; });
+
+      const isCorrect = selected === state.correctAnswer;
+
+      if (isCorrect) {
+        state.score += 1;
+        state.streak += 1;
+        btnElement.classList.add('correct');
+        feedback.className = 'feedback correct-msg';
+        feedback.textContent = '⭐ すごい！せいかい！';
+      } else {
+        state.streak = 0;
+        btnElement.classList.add('wrong');
+        // 正解のボタンをハイライト
+        buttons.forEach(btn => {
+          if (parseInt(btn.dataset.value) === state.correctAnswer) {
+            btn.classList.add('show-correct');
+          }
+        });
+        feedback.className = 'feedback wrong-msg';
+        feedback.textContent = `おしいね！こたえは ${state.correctAnswer} だよ`;
+      }
+
+      state.recentResults = [...state.recentResults, isCorrect];
+      checkLevelChange(isCorrect);
+      updateStreakBadge();
+
+      // 次の問題 or 結果画面へ
+      setTimeout(() => {
+        state.currentQuestion += 1;
+        if (state.currentQuestion >= TOTAL_QUESTIONS) {
+          showResult();
+        } else {
+          nextQuestion();
+        }
+      }, 1500);
+    }
+
+    // ===== UI Update =====
+    function updateStreakBadge() {
+      streakBadge.textContent = `🔥 ${state.streak} れんぞく`;
+      if (state.streak > 0) {
+        streakBadge.classList.remove('pulse');
+        void streakBadge.offsetWidth;
+        streakBadge.classList.add('pulse');
+      }
+    }
+
+    function updateGameUI() {
+      levelBadge.textContent = `レベル ${state.level}`;
+      progressText.textContent = `${state.currentQuestion + 1} / ${TOTAL_QUESTIONS}`;
+      progressBar.style.width = `${((state.currentQuestion) / TOTAL_QUESTIONS) * 100}%`;
+    }
+
+    // ===== Question Flow =====
+    function nextQuestion() {
+      state.isAnswered = false;
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+      hintArea.innerHTML = '';
+      hintBtn.style.display = 'inline-block';
+
+      updateGameUI();
+
+      const q = generateQuestion(state.level);
+      state.num1 = q.num1;
+      state.num2 = q.num2;
+      state.operator = q.operator;
+      state.correctAnswer = q.answer;
+
+      const opSymbol = q.operator === '+' ? '＋' : '−';
+      questionText.innerHTML = `${q.num1} <span class="question-operator">${opSymbol}</span> ${q.num2} ＝ ？`;
+
+      const config = LEVEL_CONFIG[state.level];
+      const choices = generateChoices(q.answer, config.maxAnswer);
+
+      choicesGrid.innerHTML = '';
+      choices.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = val;
+        btn.dataset.value = val;
+        btn.addEventListener('click', () => handleAnswer(val, btn));
+        choicesGrid.appendChild(btn);
+      });
+    }
+
+    // ===== Result Screen =====
+    function showResult() {
+      showScreen(resultScreen);
+
+      finalScore.textContent = state.score;
+      finalLevel.textContent = `さいこうレベル: ${state.maxLevel}`;
+
+      // 星評価
+      const ratio = state.score / TOTAL_QUESTIONS;
+      let starCount;
+      if (ratio >= 0.9) starCount = 3;
+      else if (ratio >= 0.6) starCount = 2;
+      else starCount = 1;
+
+      stars.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        span.className = 'star';
+        span.textContent = i < starCount ? '⭐' : '☆';
+        stars.appendChild(span);
+      }
+
+      // メッセージ
+      const messages = [
+        'がんばったね！つぎも いっしょに やろう！',
+        'すごい！どんどん できるようになってるよ！',
+        'さんすうマスターに ちかづいてるよ！',
+      ];
+      resultMessage.textContent = messages[starCount - 1];
+
+      // 紙吹雪
+      if (ratio >= 0.6) {
+        launchConfetti();
+      }
+    }
+
+    function launchConfetti() {
+      confettiContainer.innerHTML = '';
+      const colors = ['#FFB6C1', '#DDA0DD', '#87CEEB', '#FFEAA7', '#98FB98', '#FFA07A'];
+
+      for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = `${randInt(6, 12)}px`;
+        confetti.style.height = `${randInt(6, 12)}px`;
+        confetti.style.animationDuration = `${randInt(20, 40) / 10}s`;
+        confetti.style.animationDelay = `${Math.random() * 2}s`;
+        confettiContainer.appendChild(confetti);
+      }
+
+      setTimeout(() => {
+        confettiContainer.innerHTML = '';
+      }, 5000);
+    }
+
+    // ===== Game Start / Retry =====
+    function startGame() {
+      state = createInitialState();
+      showScreen(gameScreen);
+      nextQuestion();
+    }
+
+    startBtn.addEventListener('click', startGame);
+    retryBtn.addEventListener('click', startGame);
+    hintBtn.addEventListener('click', showHint);
+  </script>
+</body>
+</html>
