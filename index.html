@@ -533,6 +533,159 @@
       100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
 
+    /* ===== Character Select Screen ===== */
+    .select-title {
+      font-size: 1.5rem;
+      color: #7B5EA7;
+      margin-bottom: 0.3rem;
+    }
+
+    .select-subtitle {
+      font-size: 0.95rem;
+      color: #B08DC5;
+      margin-bottom: 1.5rem;
+    }
+
+    .character-options {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .character-card {
+      background: white;
+      border: 3px solid #E8D5F5;
+      border-radius: 20px;
+      padding: 1rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 120px;
+      text-align: center;
+    }
+
+    .character-card:hover {
+      border-color: #DDA0DD;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(221, 160, 221, 0.3);
+    }
+
+    .character-card.selected {
+      border-color: #E056A0;
+      background: #FFF0F5;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(224, 86, 160, 0.3);
+    }
+
+    .character-card .char-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .character-card .char-name {
+      font-size: 0.9rem;
+      color: #7B5EA7;
+      font-weight: bold;
+    }
+
+    /* ===== Game Character (Navigator) ===== */
+    .game-character {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.8rem;
+      min-height: 3.5rem;
+    }
+
+    .char-face {
+      font-size: 2.5rem;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+
+    .char-face.happy {
+      animation: charHappy 0.6s ease;
+    }
+
+    .char-face.sad {
+      animation: charSad 0.5s ease;
+    }
+
+    .char-face.idle {
+      animation: charIdle 3s ease-in-out infinite;
+    }
+
+    @keyframes charHappy {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.3) rotate(-10deg); }
+      50% { transform: scale(1.2) rotate(10deg); }
+      75% { transform: scale(1.3) rotate(-5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes charSad {
+      0% { transform: scale(1); }
+      30% { transform: scale(0.85); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes charIdle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .char-speech {
+      background: #FFF5FF;
+      border: 2px solid #E8D5F5;
+      border-radius: 16px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      color: #7B5EA7;
+      position: relative;
+      max-width: 250px;
+      animation: speechPop 0.4s ease;
+    }
+
+    .char-speech::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 8px solid #E8D5F5;
+    }
+
+    .char-speech::after {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 7px solid #FFF5FF;
+    }
+
+    @keyframes speechPop {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Result screen character */
+    .result-character {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      animation: charHappy 1s ease;
+    }
+
     /* ===== Responsive ===== */
     @media (max-width: 480px) {
       .start-title { font-size: 1.8rem; }
@@ -579,6 +732,16 @@
     </div>
   </div>
 
+  <!-- ===== Character Select Screen ===== -->
+  <div class="screen" id="selectScreen">
+    <div class="card">
+      <h2 class="select-title">いっしょに あそぶ こを えらんでね！</h2>
+      <p class="select-subtitle">この こが おうえん してくれるよ</p>
+      <div class="character-options" id="characterOptions"></div>
+      <button class="btn-primary" id="selectBtn" disabled>このこに きめた！</button>
+    </div>
+  </div>
+
   <!-- ===== Game Screen ===== -->
   <div class="screen" id="gameScreen">
     <div class="card">
@@ -589,6 +752,11 @@
       </div>
       <div class="progress-bar-container">
         <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+
+      <div class="game-character" id="gameCharacter">
+        <span class="char-face idle" id="charFace"></span>
+        <div class="char-speech" id="charSpeech"></div>
       </div>
 
       <div class="question-area">
@@ -607,6 +775,7 @@
   <!-- ===== Result Screen ===== -->
   <div class="screen" id="resultScreen">
     <div class="card">
+      <div class="result-character" id="resultCharacter"></div>
       <p class="result-label">けっか はっぴょう！</p>
       <div class="result-score">
         <span class="score-num" id="finalScore">0</span>
@@ -731,6 +900,42 @@
 
     const ANIMALS = ['🐱', '🐶', '🐰', '🐻', '🐼', '🐨', '🦊', '🐸', '🐷', '🐮'];
 
+    // ===== Navigator Characters =====
+    const CHARACTERS = [
+      {
+        id: 'neko',
+        emoji: '🐱',
+        name: 'ねこせんせい',
+        idle: ['いっしょに がんばろう！', 'つぎの もんだいだよ！', 'かんがえてみてね！', 'ゆっくりで いいよ！'],
+        correct: ['にゃー！せいかい！', 'すごいにゃ～！', 'さすがだにゃ！', 'やったにゃ！てんさい！', 'にゃんて かしこいの！'],
+        wrong: ['だいじょうぶにゃ！', 'つぎは できるにゃ！', 'いっしょに がんばるにゃ！', 'ドンマイにゃ～！'],
+        streak: ['にゃにゃにゃ！のってきたね！', 'とまらないにゃ～！'],
+        result: ['おつかれさまにゃ！', 'またあそぼうにゃ！'],
+      },
+      {
+        id: 'usagi',
+        emoji: '🐰',
+        name: 'うさぎちゃん',
+        idle: ['いっしょに がんばろっ！', 'つぎの もんだい いくよ！', 'よーく かんがえてね！', 'ぴょんぴょん！'],
+        correct: ['ぴょん！せいかい！', 'すごーい！', 'やったぁ！', 'さすがだね！', 'うれしいぴょん！'],
+        wrong: ['だいじょうぶだよ！', 'つぎ がんばろっ！', 'おしかったね！', 'いっしょに がんばろ！'],
+        streak: ['すごいすごい！ぴょんぴょん！', 'とまらないね～！'],
+        result: ['おつかれさま！', 'またいっしょに あそぼうね！'],
+      },
+      {
+        id: 'kuma',
+        emoji: '🐻',
+        name: 'くまくん',
+        idle: ['いっしょに がんばろう！', 'つぎの もんだいだよ～', 'ゆっくり かんがえてね！', 'おうえん してるよ！'],
+        correct: ['がおー！せいかい！', 'すごいクマ！', 'やったね！', 'さすがだクマ！', 'かっこいいクマ！'],
+        wrong: ['だいじょうぶクマ！', 'つぎは できるクマ！', 'きにしないクマ～！', 'おうえん してるクマ！'],
+        streak: ['がおがお！すごいクマ～！', 'もう とまらないクマ！'],
+        result: ['おつかれさまクマ！', 'またあそぼうクマ！'],
+      },
+    ];
+
+    let selectedCharacter = null;
+
     // 正解メッセージバリエーション（連続正解数に応じて3段階）
     const CORRECT_MESSAGES_NORMAL = [
       { emoji: '⭐', text: 'せいかい！' },
@@ -799,9 +1004,16 @@
 
     // ===== DOM Elements =====
     const startScreen = document.getElementById('startScreen');
+    const selectScreen = document.getElementById('selectScreen');
     const gameScreen = document.getElementById('gameScreen');
     const resultScreen = document.getElementById('resultScreen');
     const startBtn = document.getElementById('startBtn');
+    const characterOptions = document.getElementById('characterOptions');
+    const selectBtn = document.getElementById('selectBtn');
+    const gameCharacter = document.getElementById('gameCharacter');
+    const charFace = document.getElementById('charFace');
+    const charSpeech = document.getElementById('charSpeech');
+    const resultCharacter = document.getElementById('resultCharacter');
     const levelBadge = document.getElementById('levelBadge');
     const progressText = document.getElementById('progressText');
     const streakBadge = document.getElementById('streakBadge');
@@ -821,8 +1033,54 @@
 
     // ===== Screen Management =====
     function showScreen(screen) {
-      [startScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
+      [startScreen, selectScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
       screen.classList.add('active');
+    }
+
+    // ===== Character Selection =====
+    function initCharacterSelect() {
+      characterOptions.innerHTML = '';
+      CHARACTERS.forEach(char => {
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        card.dataset.charId = char.id;
+        card.innerHTML = `<span class="char-emoji">${char.emoji}</span><span class="char-name">${char.name}</span>`;
+        card.addEventListener('click', () => {
+          characterOptions.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedCharacter = char;
+          selectBtn.disabled = false;
+          playButtonSound();
+        });
+        characterOptions.appendChild(card);
+      });
+    }
+
+    function getCharSpeech(type) {
+      if (!selectedCharacter) return '';
+      const messages = selectedCharacter[type];
+      return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    function updateCharReaction(type) {
+      if (!selectedCharacter) return;
+
+      charFace.textContent = selectedCharacter.emoji;
+      charFace.className = 'char-face';
+      void charFace.offsetWidth; // reflow for re-trigger
+
+      if (type === 'correct') {
+        charFace.classList.add('happy');
+      } else if (type === 'wrong') {
+        charFace.classList.add('sad');
+      } else {
+        charFace.classList.add('idle');
+      }
+
+      charSpeech.textContent = getCharSpeech(type);
+      charSpeech.style.animation = 'none';
+      void charSpeech.offsetWidth;
+      charSpeech.style.animation = '';
     }
 
     // ===== Random Utilities =====
@@ -1097,6 +1355,9 @@
         const msg = getCorrectMessage(state.streak);
         feedback.innerHTML = `<span class="feedback-emoji">${msg.emoji}</span> ${state.streak >= 5 && state.streak % 5 === 0 ? '<span class="rainbow-text">' + msg.text + '</span>' : msg.text}`;
 
+        // キャラリアクション
+        updateCharReaction(state.streak >= 3 ? 'streak' : 'correct');
+
         // 効果音
         if (state.streak >= 3 && state.streak % 3 === 0) {
           playStreakSound(state.streak);
@@ -1123,6 +1384,9 @@
         const wrongMsg = WRONG_MESSAGES[Math.floor(Math.random() * WRONG_MESSAGES.length)];
         feedback.textContent = `${wrongMsg} ${state.correctAnswer} だよ`;
         playWrongSound();
+
+        // キャラリアクション
+        updateCharReaction('wrong');
       }
 
       state.recentResults = [...state.recentResults, isCorrect];
@@ -1165,6 +1429,7 @@
       hintBtn.style.display = 'inline-block';
 
       updateGameUI();
+      updateCharReaction('idle');
 
       const q = generateQuestion(state.level);
       state.num1 = q.num1;
@@ -1193,6 +1458,11 @@
     function showResult() {
       showScreen(resultScreen);
 
+      // キャラクター表示
+      if (selectedCharacter) {
+        resultCharacter.textContent = selectedCharacter.emoji;
+      }
+
       finalScore.textContent = state.score;
       finalLevel.textContent = `さいこうレベル: ${state.maxLevel}`;
 
@@ -1211,13 +1481,14 @@
         stars.appendChild(span);
       }
 
-      // メッセージ
+      // メッセージ（キャラのセリフ + 汎用メッセージ）
+      const charMsg = selectedCharacter ? getCharSpeech('result') : '';
       const messages = [
         'がんばったね！つぎも いっしょに やろう！',
         'すごい！どんどん できるようになってるよ！',
         'さんすうマスターに ちかづいてるよ！',
       ];
-      resultMessage.textContent = messages[starCount - 1];
+      resultMessage.textContent = charMsg ? `${charMsg} ${messages[starCount - 1]}` : messages[starCount - 1];
 
       // 効果音 & 紙吹雪
       playResultSound(ratio);
@@ -1248,6 +1519,12 @@
     }
 
     // ===== Game Start / Retry =====
+    function goToCharacterSelect() {
+      playButtonSound();
+      initCharacterSelect();
+      showScreen(selectScreen);
+    }
+
     function startGame() {
       state = createInitialState();
       playButtonSound();
@@ -1255,7 +1532,8 @@
       nextQuestion();
     }
 
-    startBtn.addEventListener('click', startGame);
+    startBtn.addEventListener('click', goToCharacterSelect);
+    selectBtn.addEventListener('click', startGame);
     retryBtn.addEventListener('click', startGame);
     hintBtn.addEventListener('click', showHint);
   </script>
