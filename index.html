@@ -360,6 +360,71 @@
       color: #E056A0;
     }
 
+    /* Streak milestone effects */
+    .sparkle-burst {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 80;
+    }
+
+    .sparkle {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: sparkleFly 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes sparkleFly {
+      0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+      50% { opacity: 1; transform: translate(var(--tx), var(--ty)) scale(1.2); }
+      100% { opacity: 0; transform: translate(var(--tx2), var(--ty2)) scale(0); }
+    }
+
+    .feedback-emoji {
+      display: inline-block;
+      animation: feedbackPop 0.6s ease;
+    }
+
+    @keyframes feedbackPop {
+      0% { transform: scale(0) rotate(-20deg); }
+      50% { transform: scale(1.4) rotate(10deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .rainbow-text {
+      background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #9B59B6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.6rem;
+    }
+
+    .streak-fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 80;
+    }
+
+    .firework-particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: fireworkBurst 1s ease-out forwards;
+    }
+
+    @keyframes fireworkBurst {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(0); }
+    }
+
     /* Level up notification */
     .level-notification {
       position: fixed;
@@ -555,6 +620,107 @@
   </div>
 
   <script>
+    // ===== Sound Effects (Web Audio API) =====
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new AudioCtx();
+      }
+      return audioCtx;
+    }
+
+    function playTone(frequency, duration, type, volume, ramp) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+        if (ramp) {
+          osc.frequency.linearRampToValueAtTime(ramp, ctx.currentTime + duration);
+        }
+        gain.gain.setValueAtTime(volume || 0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        // Audio not supported - fail silently
+      }
+    }
+
+    function playCorrectSound() {
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+      // 明るい2音の上昇音
+      playTone(523, 0.15, 'sine', 0.25); // C5
+      setTimeout(() => playTone(659, 0.2, 'sine', 0.25), 100); // E5
+      setTimeout(() => playTone(784, 0.3, 'sine', 0.2), 200); // G5
+    }
+
+    function playStreakSound(streak) {
+      // 連続正解数に応じて音が豪華になる
+      const ctx = getAudioCtx();
+      if (streak >= 10) {
+        // ファンファーレ風
+        playTone(523, 0.12, 'sine', 0.2);
+        setTimeout(() => playTone(659, 0.12, 'sine', 0.2), 80);
+        setTimeout(() => playTone(784, 0.12, 'sine', 0.2), 160);
+        setTimeout(() => playTone(1047, 0.4, 'triangle', 0.25), 240);
+      } else if (streak >= 5) {
+        // キラキラ音
+        playTone(784, 0.15, 'sine', 0.2);
+        setTimeout(() => playTone(988, 0.15, 'sine', 0.2), 100);
+        setTimeout(() => playTone(1175, 0.25, 'sine', 0.15), 200);
+      }
+    }
+
+    function playWrongSound() {
+      // やさしい低音2音
+      playTone(330, 0.2, 'sine', 0.15); // E4
+      setTimeout(() => playTone(262, 0.3, 'sine', 0.12), 150); // C4
+    }
+
+    function playLevelUpSound() {
+      // 上昇スケール
+      const notes = [523, 587, 659, 784, 880, 1047]; // C D E G A C
+      notes.forEach((freq, i) => {
+        setTimeout(() => playTone(freq, 0.15, 'triangle', 0.2), i * 80);
+      });
+    }
+
+    function playLevelDownSound() {
+      // ゆるやかな下降音
+      playTone(440, 0.2, 'sine', 0.12, 330);
+    }
+
+    function playButtonSound() {
+      playTone(880, 0.08, 'sine', 0.1);
+    }
+
+    function playResultSound(ratio) {
+      if (ratio >= 0.9) {
+        // 豪華ファンファーレ
+        const melody = [523, 659, 784, 1047, 784, 1047];
+        melody.forEach((freq, i) => {
+          setTimeout(() => playTone(freq, 0.2, 'triangle', 0.2), i * 120);
+        });
+      } else if (ratio >= 0.6) {
+        // お疲れさまメロディ
+        const melody = [523, 659, 784, 659];
+        melody.forEach((freq, i) => {
+          setTimeout(() => playTone(freq, 0.2, 'sine', 0.15), i * 150);
+        });
+      } else {
+        // がんばったねメロディ
+        playTone(440, 0.3, 'sine', 0.12);
+        setTimeout(() => playTone(523, 0.4, 'sine', 0.15), 200);
+      }
+    }
+
     // ===== Constants =====
     const TOTAL_QUESTIONS = 30;
     const LEVEL_UP_STREAK = 10;
@@ -564,6 +730,39 @@
     const MIN_LEVEL = 1;
 
     const ANIMALS = ['🐱', '🐶', '🐰', '🐻', '🐼', '🐨', '🦊', '🐸', '🐷', '🐮'];
+
+    // 正解メッセージバリエーション（連続正解数に応じて3段階）
+    const CORRECT_MESSAGES_NORMAL = [
+      { emoji: '⭐', text: 'せいかい！' },
+      { emoji: '🎉', text: 'やったね！' },
+      { emoji: '✨', text: 'すごい！' },
+      { emoji: '💮', text: 'はなまる！' },
+      { emoji: '👏', text: 'ぱちぱち！' },
+      { emoji: '🌟', text: 'きらきら！' },
+      { emoji: '💪', text: 'つよい！' },
+      { emoji: '🎀', text: 'かわいく せいかい！' },
+    ];
+
+    const CORRECT_MESSAGES_STREAK5 = [
+      { emoji: '🔥', text: '5れんぞく！すごいよ！' },
+      { emoji: '🌈', text: 'にじがでたよ！すてき！' },
+      { emoji: '🦄', text: 'ユニコーンきゅう！' },
+      { emoji: '🚀', text: 'ロケットはっしゃ！' },
+    ];
+
+    const CORRECT_MESSAGES_STREAK10 = [
+      { emoji: '👑', text: '10れんぞく！てんさい！' },
+      { emoji: '🏆', text: 'チャンピオン！' },
+      { emoji: '💎', text: 'ダイヤモンドきゅう！' },
+    ];
+
+    const WRONG_MESSAGES = [
+      'おしいね！こたえは',
+      'つぎは できるよ！こたえは',
+      'ドンマイ！こたえは',
+      'もうちょっと！こたえは',
+      'だいじょうぶ！こたえは',
+    ];
 
     const LEVEL_CONFIG = [
       null, // index 0 unused
@@ -792,6 +991,11 @@
 
       if (state.level !== prevLevel) {
         showLevelNotification(state.level, state.level > prevLevel);
+        if (state.level > prevLevel) {
+          playLevelUpSound();
+        } else {
+          playLevelDownSound();
+        }
       }
     }
 
@@ -802,6 +1006,71 @@
       levelNotification.classList.remove('show');
       void levelNotification.offsetWidth; // reflow
       levelNotification.classList.add('show');
+    }
+
+    // ===== Correct Message Selection =====
+    function getCorrectMessage(streak) {
+      if (streak >= 10 && streak % 5 === 0) {
+        return CORRECT_MESSAGES_STREAK10[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK10.length)];
+      }
+      if (streak >= 5) {
+        return CORRECT_MESSAGES_STREAK5[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK5.length)];
+      }
+      return CORRECT_MESSAGES_NORMAL[Math.floor(Math.random() * CORRECT_MESSAGES_NORMAL.length)];
+    }
+
+    // ===== Sparkle Burst Effect =====
+    function launchSparkles() {
+      const container = document.createElement('div');
+      container.className = 'sparkle-burst';
+      document.body.appendChild(container);
+
+      const sparkleEmojis = ['✨', '⭐', '🌟', '💫', '🎀', '💖'];
+      for (let i = 0; i < 12; i++) {
+        const sparkle = document.createElement('span');
+        sparkle.className = 'sparkle';
+        sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+        const angle = (i / 12) * Math.PI * 2;
+        const dist = randInt(60, 120);
+        const dist2 = dist + randInt(20, 50);
+        sparkle.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+        sparkle.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+        sparkle.style.setProperty('--tx2', `${Math.cos(angle) * dist2}px`);
+        sparkle.style.setProperty('--ty2', `${Math.sin(angle) * dist2}px`);
+        sparkle.style.animationDelay = `${i * 0.05}s`;
+        container.appendChild(sparkle);
+      }
+
+      setTimeout(() => container.remove(), 1500);
+    }
+
+    // ===== Fireworks Effect (10+ streak) =====
+    function launchFireworks() {
+      const container = document.createElement('div');
+      container.className = 'streak-fireworks';
+      document.body.appendChild(container);
+
+      const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#DDA0DD', '#FFB6C1'];
+
+      for (let burst = 0; burst < 3; burst++) {
+        const cx = randInt(20, 80);
+        const cy = randInt(20, 60);
+        for (let i = 0; i < 20; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'firework-particle';
+          particle.style.left = `${cx}%`;
+          particle.style.top = `${cy}%`;
+          particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          const angle = (i / 20) * Math.PI * 2;
+          const dist = randInt(40, 100);
+          particle.style.setProperty('--fx', `${Math.cos(angle) * dist}px`);
+          particle.style.setProperty('--fy', `${Math.sin(angle) * dist}px`);
+          particle.style.animationDelay = `${burst * 0.3 + Math.random() * 0.2}s`;
+          container.appendChild(particle);
+        }
+      }
+
+      setTimeout(() => container.remove(), 2000);
     }
 
     // ===== Answer Handler =====
@@ -819,7 +1088,25 @@
         state.streak += 1;
         btnElement.classList.add('correct');
         feedback.className = 'feedback correct-msg';
-        feedback.textContent = '⭐ すごい！せいかい！';
+
+        const msg = getCorrectMessage(state.streak);
+        feedback.innerHTML = `<span class="feedback-emoji">${msg.emoji}</span> ${state.streak >= 10 ? '<span class="rainbow-text">' + msg.text + '</span>' : msg.text}`;
+
+        // 効果音
+        if (state.streak >= 5 && state.streak % 5 === 0) {
+          playStreakSound(state.streak);
+        } else {
+          playCorrectSound();
+        }
+
+        // 連続正解マイルストーンで特別演出
+        if (state.streak === 5) {
+          launchSparkles();
+        } else if (state.streak >= 10 && state.streak % 5 === 0) {
+          launchFireworks();
+        } else if (state.streak >= 3) {
+          launchSparkles();
+        }
       } else {
         state.streak = 0;
         btnElement.classList.add('wrong');
@@ -830,7 +1117,9 @@
           }
         });
         feedback.className = 'feedback wrong-msg';
-        feedback.textContent = `おしいね！こたえは ${state.correctAnswer} だよ`;
+        const wrongMsg = WRONG_MESSAGES[Math.floor(Math.random() * WRONG_MESSAGES.length)];
+        feedback.textContent = `${wrongMsg} ${state.correctAnswer} だよ`;
+        playWrongSound();
       }
 
       state.recentResults = [...state.recentResults, isCorrect];
@@ -927,7 +1216,8 @@
       ];
       resultMessage.textContent = messages[starCount - 1];
 
-      // 紙吹雪
+      // 効果音 & 紙吹雪
+      playResultSound(ratio);
       if (ratio >= 0.6) {
         launchConfetti();
       }
@@ -957,6 +1247,7 @@
     // ===== Game Start / Retry =====
     function startGame() {
       state = createInitialState();
+      playButtonSound();
       showScreen(gameScreen);
       nextQuestion();
     }
