@@ -723,7 +723,7 @@
 
     // ===== Constants =====
     const TOTAL_QUESTIONS = 30;
-    const LEVEL_UP_STREAK = 10;
+    const LEVEL_UP_STREAK = 5;
     const LEVEL_DOWN_THRESHOLD = 4; // 直近5問中この数以上不正解でレベルダウン
     const LEVEL_DOWN_WINDOW = 5;
     const MAX_LEVEL = 5;
@@ -743,15 +743,15 @@
       { emoji: '🎀', text: 'かわいく せいかい！' },
     ];
 
-    const CORRECT_MESSAGES_STREAK5 = [
-      { emoji: '🔥', text: '5れんぞく！すごいよ！' },
+    const CORRECT_MESSAGES_STREAK3 = [
+      { emoji: '🔥', text: '3れんぞく！いいかんじ！' },
       { emoji: '🌈', text: 'にじがでたよ！すてき！' },
       { emoji: '🦄', text: 'ユニコーンきゅう！' },
       { emoji: '🚀', text: 'ロケットはっしゃ！' },
     ];
 
-    const CORRECT_MESSAGES_STREAK10 = [
-      { emoji: '👑', text: '10れんぞく！てんさい！' },
+    const CORRECT_MESSAGES_STREAK5 = [
+      { emoji: '👑', text: '5れんぞく！てんさい！' },
       { emoji: '🏆', text: 'チャンピオン！' },
       { emoji: '💎', text: 'ダイヤモンドきゅう！' },
     ];
@@ -1010,11 +1010,11 @@
 
     // ===== Correct Message Selection =====
     function getCorrectMessage(streak) {
-      if (streak >= 10 && streak % 5 === 0) {
-        return CORRECT_MESSAGES_STREAK10[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK10.length)];
-      }
-      if (streak >= 5) {
+      if (streak >= 5 && streak % 5 === 0) {
         return CORRECT_MESSAGES_STREAK5[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK5.length)];
+      }
+      if (streak >= 3) {
+        return CORRECT_MESSAGES_STREAK3[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK3.length)];
       }
       return CORRECT_MESSAGES_NORMAL[Math.floor(Math.random() * CORRECT_MESSAGES_NORMAL.length)];
     }
@@ -1090,19 +1090,17 @@
         feedback.className = 'feedback correct-msg';
 
         const msg = getCorrectMessage(state.streak);
-        feedback.innerHTML = `<span class="feedback-emoji">${msg.emoji}</span> ${state.streak >= 10 ? '<span class="rainbow-text">' + msg.text + '</span>' : msg.text}`;
+        feedback.innerHTML = `<span class="feedback-emoji">${msg.emoji}</span> ${state.streak >= 5 && state.streak % 5 === 0 ? '<span class="rainbow-text">' + msg.text + '</span>' : msg.text}`;
 
         // 効果音
-        if (state.streak >= 5 && state.streak % 5 === 0) {
+        if (state.streak >= 3 && state.streak % 3 === 0) {
           playStreakSound(state.streak);
         } else {
           playCorrectSound();
         }
 
         // 連続正解マイルストーンで特別演出
-        if (state.streak === 5) {
-          launchSparkles();
-        } else if (state.streak >= 10 && state.streak % 5 === 0) {
+        if (state.streak >= 5 && state.streak % 5 === 0) {
           launchFireworks();
         } else if (state.streak >= 3) {
           launchSparkles();
