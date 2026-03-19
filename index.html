@@ -726,7 +726,7 @@
     const LEVEL_UP_STREAK = 5;
     const LEVEL_DOWN_THRESHOLD = 4; // 直近5問中この数以上不正解でレベルダウン
     const LEVEL_DOWN_WINDOW = 5;
-    const MAX_LEVEL = 5;
+    const MAX_LEVEL = 10;
     const MIN_LEVEL = 1;
 
     const ANIMALS = ['🐱', '🐶', '🐰', '🐻', '🐼', '🐨', '🦊', '🐸', '🐷', '🐮'];
@@ -766,11 +766,16 @@
 
     const LEVEL_CONFIG = [
       null, // index 0 unused
-      { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },   // Lv1: 1~10 足し引き
-      { maxNum: 20, maxAnswer: 20, ops: ['+', '-'] },   // Lv2: 1~20 足し引き
-      { maxNum: 50, maxAnswer: 50, ops: ['+', '-'] },   // Lv3: 1~50 足し引き
-      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] }, // Lv4: 1~100 足し引き
-      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] }, // Lv5: 1~100 繰り上がり繰り下がりあり
+      { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },    // Lv1:  1~10  足し引き
+      { maxNum: 15, maxAnswer: 15, ops: ['+', '-'] },    // Lv2:  1~15  足し引き
+      { maxNum: 20, maxAnswer: 20, ops: ['+', '-'] },    // Lv3:  1~20  足し引き
+      { maxNum: 30, maxAnswer: 30, ops: ['+', '-'] },    // Lv4:  1~30  足し引き
+      { maxNum: 40, maxAnswer: 40, ops: ['+', '-'] },    // Lv5:  1~40  足し引き
+      { maxNum: 50, maxAnswer: 50, ops: ['+', '-'] },    // Lv6:  1~50  足し引き
+      { maxNum: 70, maxAnswer: 70, ops: ['+', '-'] },    // Lv7:  1~70  足し引き
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },  // Lv8:  1~100 足し引き
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },  // Lv9:  1~100 繰り上がり繰り下がり
+      { maxNum: 100, maxAnswer: 200, ops: ['+', '-'] },  // Lv10: 1~100 大きい数の足し引き
     ];
 
     // ===== Game State =====
@@ -841,8 +846,8 @@
 
       let a, b, answer;
 
-      if (level === 5) {
-        // レベル5: 繰り上がり・繰り下がりを含む問題を優先
+      if (level >= 9) {
+        // レベル9-10: 繰り上がり・繰り下がりを含む問題を優先
         if (op === '+') {
           // 繰り上がり: 一の位の合計が10以上
           a = randInt(1, config.maxNum - 1);
