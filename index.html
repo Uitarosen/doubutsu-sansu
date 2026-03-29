@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -138,6 +139,70 @@
       transform: scale(0.95);
     }
 
+    /* ===== Difficulty Select Screen ===== */
+    .difficulty-title {
+      font-size: 1.5rem;
+      color: #7B5EA7;
+      margin-bottom: 0.3rem;
+    }
+
+    .difficulty-subtitle {
+      font-size: 0.95rem;
+      color: #B08DC5;
+      margin-bottom: 1.5rem;
+    }
+
+    .difficulty-options {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .difficulty-card {
+      background: white;
+      border: 3px solid #E8D5F5;
+      border-radius: 20px;
+      padding: 1.2rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 180px;
+      text-align: center;
+    }
+
+    .difficulty-card:hover {
+      border-color: #DDA0DD;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(221, 160, 221, 0.3);
+    }
+
+    .difficulty-card.selected {
+      border-color: #E056A0;
+      background: #FFF0F5;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(224, 86, 160, 0.3);
+    }
+
+    .difficulty-card .diff-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .difficulty-card .diff-name {
+      font-size: 1.2rem;
+      color: #7B5EA7;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    .difficulty-card .diff-desc {
+      font-size: 0.75rem;
+      color: #B08DC5;
+      line-height: 1.4;
+    }
+
     /* ===== Game Screen ===== */
     .game-header {
       display: flex;
@@ -153,6 +218,15 @@
       padding: 0.3rem 1rem;
       border-radius: 20px;
       font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .difficulty-mode-badge {
+      background: linear-gradient(135deg, #98D8C8, #87CEEB);
+      color: #2C6E6A;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
       font-weight: bold;
     }
 
@@ -328,7 +402,7 @@
     }
 
     .hint-animal.crossed::after {
-      content: '✕';
+      content: '\2715';
       position: absolute;
       top: 50%;
       left: 50%;
@@ -480,6 +554,16 @@
       margin-bottom: 1rem;
     }
 
+    .result-difficulty {
+      font-size: 1rem;
+      color: #2C6E6A;
+      background: linear-gradient(135deg, #98D8C8, #87CEEB);
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 0.5rem;
+    }
+
     .stars {
       font-size: 3rem;
       margin: 1rem 0;
@@ -505,6 +589,35 @@
       font-size: 1.2rem;
       color: #7B5EA7;
       margin-bottom: 1.5rem;
+    }
+
+    .result-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #87CEEB, #98D8C8);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1.2rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(135, 206, 235, 0.6);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.95);
     }
 
     /* Confetti */
@@ -693,6 +806,7 @@
       .choice-btn { font-size: 1.5rem; padding: 0.8rem; }
       .card { padding: 1.5rem 1rem; }
       .hint-animal { font-size: 1.5rem; }
+      .difficulty-card { width: 150px; }
     }
 
     @media (min-width: 768px) {
@@ -742,11 +856,33 @@
     </div>
   </div>
 
+  <!-- ===== Difficulty Select Screen ===== -->
+  <div class="screen" id="difficultyScreen">
+    <div class="card">
+      <h2 class="difficulty-title">むずかしさを えらんでね！</h2>
+      <p class="difficulty-subtitle">どっちに ちょうせん する？</p>
+      <div class="difficulty-options" id="difficultyOptions">
+        <div class="difficulty-card" data-difficulty="easy">
+          <span class="diff-emoji">🌸</span>
+          <span class="diff-name">やさしい</span>
+          <p class="diff-desc">たしざん と ひきざん<br>2つの かずで れんしゅう！</p>
+        </div>
+        <div class="difficulty-card" data-difficulty="hard">
+          <span class="diff-emoji">🔥</span>
+          <span class="diff-name">がんばる</span>
+          <p class="diff-desc">3つの かずで ちょうせん！<br>1+2+3 みたいな もんだい！</p>
+        </div>
+      </div>
+      <button class="btn-primary" id="difficultyBtn" disabled>これに する！</button>
+    </div>
+  </div>
+
   <!-- ===== Game Screen ===== -->
   <div class="screen" id="gameScreen">
     <div class="card">
       <div class="game-header">
         <span class="level-badge" id="levelBadge">レベル 1</span>
+        <span class="difficulty-mode-badge" id="difficultyModeBadge">やさしい</span>
         <span class="progress-text" id="progressText">1 / 30</span>
         <span class="streak-badge" id="streakBadge">🔥 0 れんぞく</span>
       </div>
@@ -781,10 +917,14 @@
         <span class="score-num" id="finalScore">0</span>
         <span> / 30</span>
       </div>
+      <div class="result-difficulty" id="finalDifficulty"></div>
       <div class="result-level" id="finalLevel">さいこうレベル: 1</div>
       <div class="stars" id="stars"></div>
       <p class="result-message" id="resultMessage"></p>
-      <button class="btn-primary" id="retryBtn">もういちど！</button>
+      <div class="result-buttons">
+        <button class="btn-primary" id="retryBtn">もういちど！</button>
+        <button class="btn-secondary" id="changeDifficultyBtn">むずかしさを かえる</button>
+      </div>
     </div>
   </div>
 
@@ -822,25 +962,18 @@
     }
 
     function playCorrectSound() {
-      const ctx = getAudioCtx();
-      const now = ctx.currentTime;
-      // 明るい2音の上昇音
-      playTone(523, 0.15, 'sine', 0.25); // C5
-      setTimeout(() => playTone(659, 0.2, 'sine', 0.25), 100); // E5
-      setTimeout(() => playTone(784, 0.3, 'sine', 0.2), 200); // G5
+      playTone(523, 0.15, 'sine', 0.25);
+      setTimeout(() => playTone(659, 0.2, 'sine', 0.25), 100);
+      setTimeout(() => playTone(784, 0.3, 'sine', 0.2), 200);
     }
 
     function playStreakSound(streak) {
-      // 連続正解数に応じて音が豪華になる
-      const ctx = getAudioCtx();
       if (streak >= 10) {
-        // ファンファーレ風
         playTone(523, 0.12, 'sine', 0.2);
         setTimeout(() => playTone(659, 0.12, 'sine', 0.2), 80);
         setTimeout(() => playTone(784, 0.12, 'sine', 0.2), 160);
         setTimeout(() => playTone(1047, 0.4, 'triangle', 0.25), 240);
       } else if (streak >= 5) {
-        // キラキラ音
         playTone(784, 0.15, 'sine', 0.2);
         setTimeout(() => playTone(988, 0.15, 'sine', 0.2), 100);
         setTimeout(() => playTone(1175, 0.25, 'sine', 0.15), 200);
@@ -848,21 +981,18 @@
     }
 
     function playWrongSound() {
-      // やさしい低音2音
-      playTone(330, 0.2, 'sine', 0.15); // E4
-      setTimeout(() => playTone(262, 0.3, 'sine', 0.12), 150); // C4
+      playTone(330, 0.2, 'sine', 0.15);
+      setTimeout(() => playTone(262, 0.3, 'sine', 0.12), 150);
     }
 
     function playLevelUpSound() {
-      // 上昇スケール
-      const notes = [523, 587, 659, 784, 880, 1047]; // C D E G A C
+      const notes = [523, 587, 659, 784, 880, 1047];
       notes.forEach((freq, i) => {
         setTimeout(() => playTone(freq, 0.15, 'triangle', 0.2), i * 80);
       });
     }
 
     function playLevelDownSound() {
-      // ゆるやかな下降音
       playTone(440, 0.2, 'sine', 0.12, 330);
     }
 
@@ -872,19 +1002,16 @@
 
     function playResultSound(ratio) {
       if (ratio >= 0.9) {
-        // 豪華ファンファーレ
         const melody = [523, 659, 784, 1047, 784, 1047];
         melody.forEach((freq, i) => {
           setTimeout(() => playTone(freq, 0.2, 'triangle', 0.2), i * 120);
         });
       } else if (ratio >= 0.6) {
-        // お疲れさまメロディ
         const melody = [523, 659, 784, 659];
         melody.forEach((freq, i) => {
           setTimeout(() => playTone(freq, 0.2, 'sine', 0.15), i * 150);
         });
       } else {
-        // がんばったねメロディ
         playTone(440, 0.3, 'sine', 0.12);
         setTimeout(() => playTone(523, 0.4, 'sine', 0.15), 200);
       }
@@ -893,7 +1020,7 @@
     // ===== Constants =====
     const TOTAL_QUESTIONS = 30;
     const LEVEL_UP_STREAK = 5;
-    const LEVEL_DOWN_THRESHOLD = 4; // 直近5問中この数以上不正解でレベルダウン
+    const LEVEL_DOWN_THRESHOLD = 4;
     const LEVEL_DOWN_WINDOW = 5;
     const MAX_LEVEL = 10;
     const MIN_LEVEL = 1;
@@ -935,8 +1062,9 @@
     ];
 
     let selectedCharacter = null;
+    let selectedDifficulty = null; // 'easy' or 'hard'
 
-    // 正解メッセージバリエーション（連続正解数に応じて3段階）
+    // 正解メッセージバリエーション
     const CORRECT_MESSAGES_NORMAL = [
       { emoji: '⭐', text: 'せいかい！' },
       { emoji: '🎉', text: 'やったね！' },
@@ -969,19 +1097,42 @@
       'だいじょうぶ！こたえは',
     ];
 
-    const LEVEL_CONFIG = [
-      null, // index 0 unused
-      { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },    // Lv1:  1~10  足し引き
-      { maxNum: 15, maxAnswer: 15, ops: ['+', '-'] },    // Lv2:  1~15  足し引き
-      { maxNum: 20, maxAnswer: 20, ops: ['+', '-'] },    // Lv3:  1~20  足し引き
-      { maxNum: 30, maxAnswer: 30, ops: ['+', '-'] },    // Lv4:  1~30  足し引き
-      { maxNum: 40, maxAnswer: 40, ops: ['+', '-'] },    // Lv5:  1~40  足し引き
-      { maxNum: 50, maxAnswer: 50, ops: ['+', '-'] },    // Lv6:  1~50  足し引き
-      { maxNum: 70, maxAnswer: 70, ops: ['+', '-'] },    // Lv7:  1~70  足し引き
-      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },  // Lv8:  1~100 足し引き
-      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },  // Lv9:  1~100 繰り上がり繰り下がり
-      { maxNum: 100, maxAnswer: 200, ops: ['+', '-'] },  // Lv10: 1~100 大きい数の足し引き
+    // やさしいモードのレベル設定（従来通り）
+    const LEVEL_CONFIG_EASY = [
+      null,
+      { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },
+      { maxNum: 15, maxAnswer: 15, ops: ['+', '-'] },
+      { maxNum: 20, maxAnswer: 20, ops: ['+', '-'] },
+      { maxNum: 30, maxAnswer: 30, ops: ['+', '-'] },
+      { maxNum: 40, maxAnswer: 40, ops: ['+', '-'] },
+      { maxNum: 50, maxAnswer: 50, ops: ['+', '-'] },
+      { maxNum: 70, maxAnswer: 70, ops: ['+', '-'] },
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },
+      { maxNum: 100, maxAnswer: 100, ops: ['+', '-'] },
+      { maxNum: 100, maxAnswer: 200, ops: ['+', '-'] },
     ];
+
+    // がんばるモードのレベル設定（3つの数、少し広い範囲）
+    const LEVEL_CONFIG_HARD = [
+      null,
+      { maxNum: 5,   maxAnswer: 15,  ops: ['+', '-'] },   // Lv1:  1~5  3つの数
+      { maxNum: 8,   maxAnswer: 20,  ops: ['+', '-'] },   // Lv2:  1~8
+      { maxNum: 10,  maxAnswer: 25,  ops: ['+', '-'] },   // Lv3:  1~10
+      { maxNum: 15,  maxAnswer: 40,  ops: ['+', '-'] },   // Lv4:  1~15
+      { maxNum: 20,  maxAnswer: 50,  ops: ['+', '-'] },   // Lv5:  1~20
+      { maxNum: 25,  maxAnswer: 60,  ops: ['+', '-'] },   // Lv6:  1~25
+      { maxNum: 30,  maxAnswer: 80,  ops: ['+', '-'] },   // Lv7:  1~30
+      { maxNum: 40,  maxAnswer: 100, ops: ['+', '-'] },   // Lv8:  1~40
+      { maxNum: 50,  maxAnswer: 120, ops: ['+', '-'] },   // Lv9:  1~50
+      { maxNum: 50,  maxAnswer: 150, ops: ['+', '-'] },   // Lv10: 1~50 大きめ
+    ];
+
+    function getLevelConfig(level) {
+      if (selectedDifficulty === 'hard') {
+        return LEVEL_CONFIG_HARD[level];
+      }
+      return LEVEL_CONFIG_EASY[level];
+    }
 
     // ===== Game State =====
     function createInitialState() {
@@ -991,11 +1142,10 @@
         level: 1,
         maxLevel: 1,
         streak: 0,
-        recentResults: [], // 直近5問の正誤記録
+        recentResults: [],
         correctAnswer: 0,
-        num1: 0,
-        num2: 0,
-        operator: '+',
+        nums: [],        // 数値の配列（2個 or 3個）
+        operators: [],   // 演算子の配列（1個 or 2個）
         isAnswered: false,
       };
     }
@@ -1005,11 +1155,15 @@
     // ===== DOM Elements =====
     const startScreen = document.getElementById('startScreen');
     const selectScreen = document.getElementById('selectScreen');
+    const difficultyScreen = document.getElementById('difficultyScreen');
     const gameScreen = document.getElementById('gameScreen');
     const resultScreen = document.getElementById('resultScreen');
     const startBtn = document.getElementById('startBtn');
     const characterOptions = document.getElementById('characterOptions');
     const selectBtn = document.getElementById('selectBtn');
+    const difficultyOptions = document.getElementById('difficultyOptions');
+    const difficultyBtn = document.getElementById('difficultyBtn');
+    const difficultyModeBadge = document.getElementById('difficultyModeBadge');
     const gameCharacter = document.getElementById('gameCharacter');
     const charFace = document.getElementById('charFace');
     const charSpeech = document.getElementById('charSpeech');
@@ -1026,14 +1180,16 @@
     const levelNotification = document.getElementById('levelNotification');
     const confettiContainer = document.getElementById('confettiContainer');
     const finalScore = document.getElementById('finalScore');
+    const finalDifficulty = document.getElementById('finalDifficulty');
     const finalLevel = document.getElementById('finalLevel');
     const stars = document.getElementById('stars');
     const resultMessage = document.getElementById('resultMessage');
     const retryBtn = document.getElementById('retryBtn');
+    const changeDifficultyBtn = document.getElementById('changeDifficultyBtn');
 
     // ===== Screen Management =====
     function showScreen(screen) {
-      [startScreen, selectScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
+      [startScreen, selectScreen, difficultyScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
       screen.classList.add('active');
     }
 
@@ -1056,6 +1212,25 @@
       });
     }
 
+    // ===== Difficulty Selection =====
+    function initDifficultySelect() {
+      selectedDifficulty = null;
+      difficultyBtn.disabled = true;
+      difficultyOptions.querySelectorAll('.difficulty-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+    }
+
+    difficultyOptions.querySelectorAll('.difficulty-card').forEach(card => {
+      card.addEventListener('click', () => {
+        difficultyOptions.querySelectorAll('.difficulty-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedDifficulty = card.dataset.difficulty;
+        difficultyBtn.disabled = false;
+        playButtonSound();
+      });
+    });
+
     function getCharSpeech(type) {
       if (!selectedCharacter) return '';
       const messages = selectedCharacter[type];
@@ -1067,7 +1242,7 @@
 
       charFace.textContent = selectedCharacter.emoji;
       charFace.className = 'char-face';
-      void charFace.offsetWidth; // reflow for re-trigger
+      void charFace.offsetWidth;
 
       if (type === 'correct') {
         charFace.classList.add('happy');
@@ -1098,16 +1273,14 @@
     }
 
     // ===== Question Generation =====
-    function generateQuestion(level) {
-      const config = LEVEL_CONFIG[level];
+    function generateQuestionEasy(level) {
+      const config = getLevelConfig(level);
       const op = config.ops[Math.floor(Math.random() * config.ops.length)];
 
       let a, b, answer;
 
       if (level >= 9) {
-        // レベル9-10: 繰り上がり・繰り下がりを含む問題を優先
         if (op === '+') {
-          // 繰り上がり: 一の位の合計が10以上
           a = randInt(1, config.maxNum - 1);
           const minB = Math.max(1, 10 - (a % 10));
           const maxB = Math.min(config.maxNum, config.maxAnswer - a);
@@ -1118,7 +1291,6 @@
           }
           answer = a + b;
         } else {
-          // 繰り下がり: a の一の位 < b の一の位
           a = randInt(11, config.maxNum);
           const minB = Math.max(1, (a % 10) + 1);
           const maxB = Math.min(a, config.maxNum);
@@ -1141,7 +1313,50 @@
         }
       }
 
-      return { num1: a, num2: b, operator: op, answer };
+      return { nums: [a, b], operators: [op], answer };
+    }
+
+    function generateQuestionHard(level) {
+      const config = getLevelConfig(level);
+
+      // 3つの数と2つの演算子を生成
+      const op1 = config.ops[Math.floor(Math.random() * config.ops.length)];
+      const op2 = config.ops[Math.floor(Math.random() * config.ops.length)];
+
+      let a, b, c, answer;
+      let attempts = 0;
+
+      // 答えが0以上になるまでリトライ
+      do {
+        a = randInt(1, config.maxNum);
+        b = randInt(1, config.maxNum);
+        c = randInt(1, config.maxNum);
+
+        // 左から順に計算
+        let temp = a;
+        temp = op1 === '+' ? temp + b : temp - b;
+        answer = op2 === '+' ? temp + c : temp - c;
+
+        attempts++;
+      } while ((answer < 0 || answer > config.maxAnswer) && attempts < 100);
+
+      // フォールバック：答えが負なら全部足し算にする
+      if (answer < 0 || answer > config.maxAnswer) {
+        a = randInt(1, Math.floor(config.maxNum / 2));
+        b = randInt(1, Math.floor(config.maxNum / 2));
+        c = randInt(1, Math.floor(config.maxNum / 2));
+        answer = a + b + c;
+        return { nums: [a, b, c], operators: ['+', '+'], answer };
+      }
+
+      return { nums: [a, b, c], operators: [op1, op2], answer };
+    }
+
+    function generateQuestion(level) {
+      if (selectedDifficulty === 'hard') {
+        return generateQuestionHard(level);
+      }
+      return generateQuestionEasy(level);
     }
 
     // ===== Choices Generation =====
@@ -1160,7 +1375,6 @@
         attempts++;
       }
 
-      // フォールバック: 足りない場合は順番に埋める
       let fill = 0;
       while (choices.size < 4) {
         if (!choices.has(fill) && fill >= 0 && fill <= maxAnswer) {
@@ -1177,22 +1391,85 @@
       hintBtn.style.display = 'none';
       hintArea.innerHTML = '';
 
-      const animalA = ANIMALS[randInt(0, ANIMALS.length - 1)];
-      let animalB = ANIMALS[randInt(0, ANIMALS.length - 1)];
-      while (animalB === animalA) {
-        animalB = ANIMALS[randInt(0, ANIMALS.length - 1)];
+      const nums = state.nums;
+      const operators = state.operators;
+
+      // ヒントで使う動物を選ぶ（数ごとに別の動物）
+      const usedAnimals = [];
+      for (let i = 0; i < nums.length; i++) {
+        let animal;
+        do {
+          animal = ANIMALS[randInt(0, ANIMALS.length - 1)];
+        } while (usedAnimals.includes(animal));
+        usedAnimals.push(animal);
       }
 
-      if (state.operator === '+') {
-        // 足し算: num1個のanimalA + num2個のanimalB
-        const row1 = document.createElement('div');
-        row1.className = 'hint-row';
-        for (let i = 0; i < state.num1; i++) {
+      if (selectedDifficulty === 'hard') {
+        // がんばるモード: 3つの数のヒント
+        // ステップ1: 最初の2つの数の計算を表示
+        showHintStep(nums[0], operators[0], nums[1], usedAnimals[0], usedAnimals[1], 0);
+
+        // 中間結果を表示
+        const midResult = operators[0] === '+' ? nums[0] + nums[1] : nums[0] - nums[1];
+
+        const midLabel = document.createElement('div');
+        midLabel.style.fontSize = '1rem';
+        midLabel.style.color = '#7B5EA7';
+        midLabel.style.fontWeight = 'bold';
+        midLabel.style.margin = '0.3rem 0';
+        midLabel.textContent = `＝ ${midResult}`;
+        hintArea.appendChild(midLabel);
+
+        // ステップ2: 中間結果と3つ目の数
+        const opLabel2 = document.createElement('div');
+        opLabel2.style.fontSize = '1.5rem';
+        opLabel2.style.color = '#E056A0';
+        opLabel2.style.fontWeight = 'bold';
+        opLabel2.textContent = operators[1] === '+' ? '＋' : '−';
+        hintArea.appendChild(opLabel2);
+
+        const row3 = document.createElement('div');
+        row3.className = 'hint-row';
+        const maxHintCount = Math.min(nums[2], 20);
+        for (let i = 0; i < maxHintCount; i++) {
           const span = document.createElement('span');
           span.className = 'hint-animal';
-          span.textContent = animalA;
-          span.style.animationDelay = `${i * 0.1}s`;
+          span.textContent = usedAnimals[2];
+          span.style.animationDelay = `${i * 0.08}s`;
+          row3.appendChild(span);
+        }
+        if (nums[2] > 20) {
+          const more = document.createElement('span');
+          more.style.fontSize = '1rem';
+          more.style.color = '#B08DC5';
+          more.textContent = `...ほか ${nums[2] - 20}`;
+          row3.appendChild(more);
+        }
+        hintArea.appendChild(row3);
+      } else {
+        // やさしいモード: 従来のヒント
+        showHintStep(nums[0], operators[0], nums[1], usedAnimals[0], usedAnimals[1] || usedAnimals[0], 0);
+      }
+    }
+
+    function showHintStep(num1, op, num2, animal1, animal2, delayOffset) {
+      if (op === '+') {
+        const row1 = document.createElement('div');
+        row1.className = 'hint-row';
+        const maxCount1 = Math.min(num1, 20);
+        for (let i = 0; i < maxCount1; i++) {
+          const span = document.createElement('span');
+          span.className = 'hint-animal';
+          span.textContent = animal1;
+          span.style.animationDelay = `${(delayOffset + i) * 0.08}s`;
           row1.appendChild(span);
+        }
+        if (num1 > 20) {
+          const more = document.createElement('span');
+          more.style.fontSize = '1rem';
+          more.style.color = '#B08DC5';
+          more.textContent = `...ほか ${num1 - 20}`;
+          row1.appendChild(more);
         }
         hintArea.appendChild(row1);
 
@@ -1205,27 +1482,42 @@
 
         const row2 = document.createElement('div');
         row2.className = 'hint-row';
-        for (let i = 0; i < state.num2; i++) {
+        const maxCount2 = Math.min(num2, 20);
+        for (let i = 0; i < maxCount2; i++) {
           const span = document.createElement('span');
           span.className = 'hint-animal';
-          span.textContent = animalB;
-          span.style.animationDelay = `${(state.num1 + i) * 0.1}s`;
+          span.textContent = animal2;
+          span.style.animationDelay = `${(delayOffset + maxCount1 + i) * 0.08}s`;
           row2.appendChild(span);
+        }
+        if (num2 > 20) {
+          const more = document.createElement('span');
+          more.style.fontSize = '1rem';
+          more.style.color = '#B08DC5';
+          more.textContent = `...ほか ${num2 - 20}`;
+          row2.appendChild(more);
         }
         hintArea.appendChild(row2);
       } else {
-        // 引き算: num1個表示して num2個にバツ
         const row = document.createElement('div');
         row.className = 'hint-row';
-        for (let i = 0; i < state.num1; i++) {
+        const maxCount = Math.min(num1, 20);
+        for (let i = 0; i < maxCount; i++) {
           const span = document.createElement('span');
           span.className = 'hint-animal';
-          if (i >= state.num1 - state.num2) {
+          if (i >= num1 - num2 && i < maxCount) {
             span.classList.add('crossed');
           }
-          span.textContent = animalA;
-          span.style.animationDelay = `${i * 0.1}s`;
+          span.textContent = animal1;
+          span.style.animationDelay = `${(delayOffset + i) * 0.08}s`;
           row.appendChild(span);
+        }
+        if (num1 > 20) {
+          const more = document.createElement('span');
+          more.style.fontSize = '1rem';
+          more.style.color = '#B08DC5';
+          more.textContent = `...ほか ${num1 - 20}`;
+          row.appendChild(more);
         }
         hintArea.appendChild(row);
       }
@@ -1235,20 +1527,18 @@
     function checkLevelChange(isCorrect) {
       const prevLevel = state.level;
 
-      // レベルアップ: 10問連続正解
       if (isCorrect && state.streak >= LEVEL_UP_STREAK && state.level < MAX_LEVEL) {
         state.level = Math.min(state.level + 1, MAX_LEVEL);
         state.streak = 0;
         state.maxLevel = Math.max(state.maxLevel, state.level);
       }
 
-      // レベルダウン: 直近5問中4問以上不正解
       if (state.recentResults.length >= LEVEL_DOWN_WINDOW) {
         const recentWindow = state.recentResults.slice(-LEVEL_DOWN_WINDOW);
         const wrongCount = recentWindow.filter(r => !r).length;
         if (wrongCount >= LEVEL_DOWN_THRESHOLD && state.level > MIN_LEVEL) {
           state.level = Math.max(state.level - 1, MIN_LEVEL);
-          state.recentResults = []; // リセット
+          state.recentResults = [];
         }
       }
 
@@ -1267,7 +1557,7 @@
       const text = isUp ? 'レベルアップ！' : 'レベルダウン';
       levelNotification.textContent = `${emoji} ${text} レベル ${level}`;
       levelNotification.classList.remove('show');
-      void levelNotification.offsetWidth; // reflow
+      void levelNotification.offsetWidth;
       levelNotification.classList.add('show');
     }
 
@@ -1307,7 +1597,7 @@
       setTimeout(() => container.remove(), 1500);
     }
 
-    // ===== Fireworks Effect (10+ streak) =====
+    // ===== Fireworks Effect =====
     function launchFireworks() {
       const container = document.createElement('div');
       container.className = 'streak-fireworks';
@@ -1355,17 +1645,14 @@
         const msg = getCorrectMessage(state.streak);
         feedback.innerHTML = `<span class="feedback-emoji">${msg.emoji}</span> ${state.streak >= 5 && state.streak % 5 === 0 ? '<span class="rainbow-text">' + msg.text + '</span>' : msg.text}`;
 
-        // キャラリアクション
         updateCharReaction(state.streak >= 3 ? 'streak' : 'correct');
 
-        // 効果音
         if (state.streak >= 3 && state.streak % 3 === 0) {
           playStreakSound(state.streak);
         } else {
           playCorrectSound();
         }
 
-        // 連続正解マイルストーンで特別演出
         if (state.streak >= 5 && state.streak % 5 === 0) {
           launchFireworks();
         } else if (state.streak >= 3) {
@@ -1374,7 +1661,6 @@
       } else {
         state.streak = 0;
         btnElement.classList.add('wrong');
-        // 正解のボタンをハイライト
         buttons.forEach(btn => {
           if (parseInt(btn.dataset.value) === state.correctAnswer) {
             btn.classList.add('show-correct');
@@ -1385,7 +1671,6 @@
         feedback.textContent = `${wrongMsg} ${state.correctAnswer} だよ`;
         playWrongSound();
 
-        // キャラリアクション
         updateCharReaction('wrong');
       }
 
@@ -1393,7 +1678,6 @@
       checkLevelChange(isCorrect);
       updateStreakBadge();
 
-      // 次の問題 or 結果画面へ
       setTimeout(() => {
         state.currentQuestion += 1;
         if (state.currentQuestion >= TOTAL_QUESTIONS) {
@@ -1416,6 +1700,7 @@
 
     function updateGameUI() {
       levelBadge.textContent = `レベル ${state.level}`;
+      difficultyModeBadge.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
       progressText.textContent = `${state.currentQuestion + 1} / ${TOTAL_QUESTIONS}`;
       progressBar.style.width = `${((state.currentQuestion) / TOTAL_QUESTIONS) * 100}%`;
     }
@@ -1432,15 +1717,20 @@
       updateCharReaction('idle');
 
       const q = generateQuestion(state.level);
-      state.num1 = q.num1;
-      state.num2 = q.num2;
-      state.operator = q.operator;
+      state.nums = q.nums;
+      state.operators = q.operators;
       state.correctAnswer = q.answer;
 
-      const opSymbol = q.operator === '+' ? '＋' : '−';
-      questionText.innerHTML = `${q.num1} <span class="question-operator">${opSymbol}</span> ${q.num2} ＝ ？`;
+      // 問題文の組み立て
+      let questionHTML = `${q.nums[0]}`;
+      for (let i = 0; i < q.operators.length; i++) {
+        const opSymbol = q.operators[i] === '+' ? '＋' : '−';
+        questionHTML += ` <span class="question-operator">${opSymbol}</span> ${q.nums[i + 1]}`;
+      }
+      questionHTML += ' ＝ ？';
+      questionText.innerHTML = questionHTML;
 
-      const config = LEVEL_CONFIG[state.level];
+      const config = getLevelConfig(state.level);
       const choices = generateChoices(q.answer, config.maxAnswer);
 
       choicesGrid.innerHTML = '';
@@ -1458,15 +1748,14 @@
     function showResult() {
       showScreen(resultScreen);
 
-      // キャラクター表示
       if (selectedCharacter) {
         resultCharacter.textContent = selectedCharacter.emoji;
       }
 
       finalScore.textContent = state.score;
+      finalDifficulty.textContent = selectedDifficulty === 'hard' ? '🔥 がんばるモード' : '🌸 やさしいモード';
       finalLevel.textContent = `さいこうレベル: ${state.maxLevel}`;
 
-      // 星評価
       const ratio = state.score / TOTAL_QUESTIONS;
       let starCount;
       if (ratio >= 0.9) starCount = 3;
@@ -1481,7 +1770,6 @@
         stars.appendChild(span);
       }
 
-      // メッセージ（キャラのセリフ + 汎用メッセージ）
       const charMsg = selectedCharacter ? getCharSpeech('result') : '';
       const messages = [
         'がんばったね！つぎも いっしょに やろう！',
@@ -1490,7 +1778,6 @@
       ];
       resultMessage.textContent = charMsg ? `${charMsg} ${messages[starCount - 1]}` : messages[starCount - 1];
 
-      // 効果音 & 紙吹雪
       playResultSound(ratio);
       if (ratio >= 0.6) {
         launchConfetti();
@@ -1525,6 +1812,12 @@
       showScreen(selectScreen);
     }
 
+    function goToDifficultySelect() {
+      playButtonSound();
+      initDifficultySelect();
+      showScreen(difficultyScreen);
+    }
+
     function startGame() {
       state = createInitialState();
       playButtonSound();
@@ -1533,8 +1826,10 @@
     }
 
     startBtn.addEventListener('click', goToCharacterSelect);
-    selectBtn.addEventListener('click', startGame);
+    selectBtn.addEventListener('click', goToDifficultySelect);
+    difficultyBtn.addEventListener('click', startGame);
     retryBtn.addEventListener('click', startGame);
+    changeDifficultyBtn.addEventListener('click', goToDifficultySelect);
     hintBtn.addEventListener('click', showHint);
   </script>
 </body>
