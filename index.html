@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -139,7 +138,29 @@
       transform: scale(0.95);
     }
 
-    /* ===== Difficulty Select Screen ===== */
+    .btn-secondary {
+      background: linear-gradient(135deg, #87CEEB, #98D8C8);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1.2rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(135, 206, 235, 0.6);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.95);
+    }
+
+    /* ===== Game Mode / Difficulty Select Screen ===== */
     .difficulty-title {
       font-size: 1.5rem;
       color: #7B5EA7;
@@ -210,6 +231,8 @@
       align-items: center;
       margin-bottom: 1rem;
       width: 100%;
+      flex-wrap: wrap;
+      gap: 0.3rem;
     }
 
     .level-badge {
@@ -252,6 +275,48 @@
       0% { transform: scale(1); }
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
+    }
+
+    /* Timer */
+    .timer-container {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .timer-display {
+      font-size: 2rem;
+      color: #E056A0;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .timer-display.warning {
+      color: #E74C3C;
+      animation: timerPulse 0.5s ease infinite;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .timer-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #F0E6FF;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77);
+      border-radius: 6px;
+      transition: width 0.1s linear;
+    }
+
+    .timer-bar-fill.warning {
+      background: linear-gradient(90deg, #E74C3C, #FF6B6B);
     }
 
     /* Progress Bar */
@@ -564,6 +629,16 @@
       margin-bottom: 0.5rem;
     }
 
+    .result-mode {
+      font-size: 1rem;
+      color: #C0392B;
+      background: linear-gradient(135deg, #FF9A9E, #FECFEF);
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 0.5rem;
+    }
+
     .stars {
       font-size: 3rem;
       margin: 1rem 0;
@@ -596,28 +671,6 @@
       flex-direction: column;
       gap: 0.8rem;
       align-items: center;
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, #87CEEB, #98D8C8);
-      color: white;
-      border: none;
-      padding: 0.8rem 2rem;
-      font-size: 1.2rem;
-      font-family: 'Kosugi Maru', sans-serif;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-secondary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(135, 206, 235, 0.6);
-    }
-
-    .btn-secondary:active {
-      transform: scale(0.95);
     }
 
     /* Confetti */
@@ -806,7 +859,7 @@
       .choice-btn { font-size: 1.5rem; padding: 0.8rem; }
       .card { padding: 1.5rem 1rem; }
       .hint-animal { font-size: 1.5rem; }
-      .difficulty-card { width: 150px; }
+      .difficulty-card { width: 140px; }
     }
 
     @media (min-width: 768px) {
@@ -856,6 +909,27 @@
     </div>
   </div>
 
+  <!-- ===== Game Mode Select Screen ===== -->
+  <div class="screen" id="modeScreen">
+    <div class="card">
+      <h2 class="difficulty-title">あそびかたを えらんでね！</h2>
+      <p class="difficulty-subtitle">どっちで あそぶ？</p>
+      <div class="difficulty-options" id="modeOptions">
+        <div class="difficulty-card" data-mode="normal">
+          <span class="diff-emoji">📝</span>
+          <span class="diff-name">ふつう</span>
+          <p class="diff-desc">30もん に ちょうせん！<br>じっくり かんがえよう</p>
+        </div>
+        <div class="difficulty-card" data-mode="timeattack">
+          <span class="diff-emoji">⏱️</span>
+          <span class="diff-name">タイムアタック</span>
+          <p class="diff-desc">60びょうで なんもん<br>とけるかな？</p>
+        </div>
+      </div>
+      <button class="btn-primary" id="modeBtn" disabled>これに する！</button>
+    </div>
+  </div>
+
   <!-- ===== Difficulty Select Screen ===== -->
   <div class="screen" id="difficultyScreen">
     <div class="card">
@@ -886,7 +960,17 @@
         <span class="progress-text" id="progressText">1 / 30</span>
         <span class="streak-badge" id="streakBadge">🔥 0 れんぞく</span>
       </div>
-      <div class="progress-bar-container">
+
+      <!-- Timer (time attack only) -->
+      <div class="timer-container" id="timerContainer" style="display: none;">
+        <div class="timer-display" id="timerDisplay">⏱️ 60</div>
+        <div class="timer-bar-container">
+          <div class="timer-bar-fill" id="timerBar" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Progress bar (normal mode only) -->
+      <div class="progress-bar-container" id="progressBarContainer">
         <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
       </div>
 
@@ -912,18 +996,19 @@
   <div class="screen" id="resultScreen">
     <div class="card">
       <div class="result-character" id="resultCharacter"></div>
-      <p class="result-label">けっか はっぴょう！</p>
-      <div class="result-score">
+      <p class="result-label" id="resultLabel">けっか はっぴょう！</p>
+      <div class="result-score" id="resultScoreArea">
         <span class="score-num" id="finalScore">0</span>
-        <span> / 30</span>
+        <span id="resultTotal"> / 30</span>
       </div>
+      <div class="result-mode" id="finalMode" style="display: none;"></div>
       <div class="result-difficulty" id="finalDifficulty"></div>
       <div class="result-level" id="finalLevel">さいこうレベル: 1</div>
       <div class="stars" id="stars"></div>
       <p class="result-message" id="resultMessage"></p>
       <div class="result-buttons">
         <button class="btn-primary" id="retryBtn">もういちど！</button>
-        <button class="btn-secondary" id="changeDifficultyBtn">むずかしさを かえる</button>
+        <button class="btn-secondary" id="changeModeBtn">モードを かえる</button>
       </div>
     </div>
   </div>
@@ -956,9 +1041,7 @@
         gain.connect(ctx.destination);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + duration);
-      } catch (e) {
-        // Audio not supported - fail silently
-      }
+      } catch (e) {}
     }
 
     function playCorrectSound() {
@@ -1000,6 +1083,16 @@
       playTone(880, 0.08, 'sine', 0.1);
     }
 
+    function playTimeUpSound() {
+      playTone(440, 0.3, 'triangle', 0.2);
+      setTimeout(() => playTone(330, 0.3, 'triangle', 0.2), 200);
+      setTimeout(() => playTone(262, 0.5, 'triangle', 0.25), 400);
+    }
+
+    function playTickSound() {
+      playTone(1000, 0.05, 'sine', 0.1);
+    }
+
     function playResultSound(ratio) {
       if (ratio >= 0.9) {
         const melody = [523, 659, 784, 1047, 784, 1047];
@@ -1019,6 +1112,7 @@
 
     // ===== Constants =====
     const TOTAL_QUESTIONS = 30;
+    const TIME_ATTACK_SECONDS = 60;
     const LEVEL_UP_STREAK = 5;
     const LEVEL_DOWN_THRESHOLD = 4;
     const LEVEL_DOWN_WINDOW = 5;
@@ -1062,7 +1156,10 @@
     ];
 
     let selectedCharacter = null;
-    let selectedDifficulty = null; // 'easy' or 'hard'
+    let selectedDifficulty = null;
+    let selectedMode = null; // 'normal' or 'timeattack'
+    let timerInterval = null;
+    let timeRemaining = TIME_ATTACK_SECONDS;
 
     // 正解メッセージバリエーション
     const CORRECT_MESSAGES_NORMAL = [
@@ -1097,7 +1194,6 @@
       'だいじょうぶ！こたえは',
     ];
 
-    // やさしいモードのレベル設定（従来通り）
     const LEVEL_CONFIG_EASY = [
       null,
       { maxNum: 10, maxAnswer: 10, ops: ['+', '-'] },
@@ -1112,19 +1208,18 @@
       { maxNum: 100, maxAnswer: 200, ops: ['+', '-'] },
     ];
 
-    // がんばるモードのレベル設定（3つの数、少し広い範囲）
     const LEVEL_CONFIG_HARD = [
       null,
-      { maxNum: 5,   maxAnswer: 15,  ops: ['+', '-'] },   // Lv1:  1~5  3つの数
-      { maxNum: 8,   maxAnswer: 20,  ops: ['+', '-'] },   // Lv2:  1~8
-      { maxNum: 10,  maxAnswer: 25,  ops: ['+', '-'] },   // Lv3:  1~10
-      { maxNum: 15,  maxAnswer: 40,  ops: ['+', '-'] },   // Lv4:  1~15
-      { maxNum: 20,  maxAnswer: 50,  ops: ['+', '-'] },   // Lv5:  1~20
-      { maxNum: 25,  maxAnswer: 60,  ops: ['+', '-'] },   // Lv6:  1~25
-      { maxNum: 30,  maxAnswer: 80,  ops: ['+', '-'] },   // Lv7:  1~30
-      { maxNum: 40,  maxAnswer: 100, ops: ['+', '-'] },   // Lv8:  1~40
-      { maxNum: 50,  maxAnswer: 120, ops: ['+', '-'] },   // Lv9:  1~50
-      { maxNum: 50,  maxAnswer: 150, ops: ['+', '-'] },   // Lv10: 1~50 大きめ
+      { maxNum: 5,   maxAnswer: 15,  ops: ['+', '-'] },
+      { maxNum: 8,   maxAnswer: 20,  ops: ['+', '-'] },
+      { maxNum: 10,  maxAnswer: 25,  ops: ['+', '-'] },
+      { maxNum: 15,  maxAnswer: 40,  ops: ['+', '-'] },
+      { maxNum: 20,  maxAnswer: 50,  ops: ['+', '-'] },
+      { maxNum: 25,  maxAnswer: 60,  ops: ['+', '-'] },
+      { maxNum: 30,  maxAnswer: 80,  ops: ['+', '-'] },
+      { maxNum: 40,  maxAnswer: 100, ops: ['+', '-'] },
+      { maxNum: 50,  maxAnswer: 120, ops: ['+', '-'] },
+      { maxNum: 50,  maxAnswer: 150, ops: ['+', '-'] },
     ];
 
     function getLevelConfig(level) {
@@ -1132,6 +1227,10 @@
         return LEVEL_CONFIG_HARD[level];
       }
       return LEVEL_CONFIG_EASY[level];
+    }
+
+    function isTimeAttack() {
+      return selectedMode === 'timeattack';
     }
 
     // ===== Game State =====
@@ -1144,8 +1243,8 @@
         streak: 0,
         recentResults: [],
         correctAnswer: 0,
-        nums: [],        // 数値の配列（2個 or 3個）
-        operators: [],   // 演算子の配列（1個 or 2個）
+        nums: [],
+        operators: [],
         isAnswered: false,
       };
     }
@@ -1155,12 +1254,15 @@
     // ===== DOM Elements =====
     const startScreen = document.getElementById('startScreen');
     const selectScreen = document.getElementById('selectScreen');
+    const modeScreen = document.getElementById('modeScreen');
     const difficultyScreen = document.getElementById('difficultyScreen');
     const gameScreen = document.getElementById('gameScreen');
     const resultScreen = document.getElementById('resultScreen');
     const startBtn = document.getElementById('startBtn');
     const characterOptions = document.getElementById('characterOptions');
     const selectBtn = document.getElementById('selectBtn');
+    const modeOptions = document.getElementById('modeOptions');
+    const modeBtn = document.getElementById('modeBtn');
     const difficultyOptions = document.getElementById('difficultyOptions');
     const difficultyBtn = document.getElementById('difficultyBtn');
     const difficultyModeBadge = document.getElementById('difficultyModeBadge');
@@ -1172,6 +1274,10 @@
     const progressText = document.getElementById('progressText');
     const streakBadge = document.getElementById('streakBadge');
     const progressBar = document.getElementById('progressBar');
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const timerContainer = document.getElementById('timerContainer');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerBar = document.getElementById('timerBar');
     const questionText = document.getElementById('questionText');
     const choicesGrid = document.getElementById('choicesGrid');
     const hintBtn = document.getElementById('hintBtn');
@@ -1179,17 +1285,20 @@
     const feedback = document.getElementById('feedback');
     const levelNotification = document.getElementById('levelNotification');
     const confettiContainer = document.getElementById('confettiContainer');
+    const resultLabel = document.getElementById('resultLabel');
     const finalScore = document.getElementById('finalScore');
+    const resultTotal = document.getElementById('resultTotal');
+    const finalMode = document.getElementById('finalMode');
     const finalDifficulty = document.getElementById('finalDifficulty');
     const finalLevel = document.getElementById('finalLevel');
     const stars = document.getElementById('stars');
     const resultMessage = document.getElementById('resultMessage');
     const retryBtn = document.getElementById('retryBtn');
-    const changeDifficultyBtn = document.getElementById('changeDifficultyBtn');
+    const changeModeBtn = document.getElementById('changeModeBtn');
 
     // ===== Screen Management =====
     function showScreen(screen) {
-      [startScreen, selectScreen, difficultyScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
+      [startScreen, selectScreen, modeScreen, difficultyScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
       screen.classList.add('active');
     }
 
@@ -1211,6 +1320,25 @@
         characterOptions.appendChild(card);
       });
     }
+
+    // ===== Mode Selection =====
+    function initModeSelect() {
+      selectedMode = null;
+      modeBtn.disabled = true;
+      modeOptions.querySelectorAll('.difficulty-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+    }
+
+    modeOptions.querySelectorAll('.difficulty-card').forEach(card => {
+      card.addEventListener('click', () => {
+        modeOptions.querySelectorAll('.difficulty-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedMode = card.dataset.mode;
+        modeBtn.disabled = false;
+        playButtonSound();
+      });
+    });
 
     // ===== Difficulty Selection =====
     function initDifficultySelect() {
@@ -1318,29 +1446,22 @@
 
     function generateQuestionHard(level) {
       const config = getLevelConfig(level);
-
-      // 3つの数と2つの演算子を生成
       const op1 = config.ops[Math.floor(Math.random() * config.ops.length)];
       const op2 = config.ops[Math.floor(Math.random() * config.ops.length)];
 
       let a, b, c, answer;
       let attempts = 0;
 
-      // 答えが0以上になるまでリトライ
       do {
         a = randInt(1, config.maxNum);
         b = randInt(1, config.maxNum);
         c = randInt(1, config.maxNum);
-
-        // 左から順に計算
         let temp = a;
         temp = op1 === '+' ? temp + b : temp - b;
         answer = op2 === '+' ? temp + c : temp - c;
-
         attempts++;
       } while ((answer < 0 || answer > config.maxAnswer) && attempts < 100);
 
-      // フォールバック：答えが負なら全部足し算にする
       if (answer < 0 || answer > config.maxAnswer) {
         a = randInt(1, Math.floor(config.maxNum / 2));
         b = randInt(1, Math.floor(config.maxNum / 2));
@@ -1362,7 +1483,6 @@
     // ===== Choices Generation =====
     function generateChoices(correctAnswer, maxAnswer) {
       const choices = new Set([correctAnswer]);
-
       const range = maxAnswer <= 10 ? 3 : maxAnswer <= 20 ? 5 : 10;
 
       let attempts = 0;
@@ -1394,7 +1514,6 @@
       const nums = state.nums;
       const operators = state.operators;
 
-      // ヒントで使う動物を選ぶ（数ごとに別の動物）
       const usedAnimals = [];
       for (let i = 0; i < nums.length; i++) {
         let animal;
@@ -1405,11 +1524,8 @@
       }
 
       if (selectedDifficulty === 'hard') {
-        // がんばるモード: 3つの数のヒント
-        // ステップ1: 最初の2つの数の計算を表示
         showHintStep(nums[0], operators[0], nums[1], usedAnimals[0], usedAnimals[1], 0);
 
-        // 中間結果を表示
         const midResult = operators[0] === '+' ? nums[0] + nums[1] : nums[0] - nums[1];
 
         const midLabel = document.createElement('div');
@@ -1417,15 +1533,14 @@
         midLabel.style.color = '#7B5EA7';
         midLabel.style.fontWeight = 'bold';
         midLabel.style.margin = '0.3rem 0';
-        midLabel.textContent = `＝ ${midResult}`;
+        midLabel.textContent = `= ${midResult}`;
         hintArea.appendChild(midLabel);
 
-        // ステップ2: 中間結果と3つ目の数
         const opLabel2 = document.createElement('div');
         opLabel2.style.fontSize = '1.5rem';
         opLabel2.style.color = '#E056A0';
         opLabel2.style.fontWeight = 'bold';
-        opLabel2.textContent = operators[1] === '+' ? '＋' : '−';
+        opLabel2.textContent = operators[1] === '+' ? '+' : '-';
         hintArea.appendChild(opLabel2);
 
         const row3 = document.createElement('div');
@@ -1447,7 +1562,6 @@
         }
         hintArea.appendChild(row3);
       } else {
-        // やさしいモード: 従来のヒント
         showHintStep(nums[0], operators[0], nums[1], usedAnimals[0], usedAnimals[1] || usedAnimals[0], 0);
       }
     }
@@ -1477,7 +1591,7 @@
         plus.style.fontSize = '1.5rem';
         plus.style.color = '#E056A0';
         plus.style.fontWeight = 'bold';
-        plus.textContent = '＋';
+        plus.textContent = '+';
         hintArea.appendChild(plus);
 
         const row2 = document.createElement('div');
@@ -1561,7 +1675,6 @@
       levelNotification.classList.add('show');
     }
 
-    // ===== Correct Message Selection =====
     function getCorrectMessage(streak) {
       if (streak >= 5 && streak % 5 === 0) {
         return CORRECT_MESSAGES_STREAK5[Math.floor(Math.random() * CORRECT_MESSAGES_STREAK5.length)];
@@ -1597,7 +1710,6 @@
       setTimeout(() => container.remove(), 1500);
     }
 
-    // ===== Fireworks Effect =====
     function launchFireworks() {
       const container = document.createElement('div');
       container.className = 'streak-fireworks';
@@ -1626,9 +1738,55 @@
       setTimeout(() => container.remove(), 2000);
     }
 
+    // ===== Timer =====
+    function startTimer() {
+      timeRemaining = TIME_ATTACK_SECONDS;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeRemaining -= 0.1;
+        if (timeRemaining <= 0) {
+          timeRemaining = 0;
+          clearInterval(timerInterval);
+          timerInterval = null;
+          updateTimerDisplay();
+          playTimeUpSound();
+          // 少し待ってから結果画面へ
+          setTimeout(() => showResult(), 500);
+          return;
+        }
+        updateTimerDisplay();
+        // 残り10秒以下でティック音
+        if (timeRemaining <= 10 && Math.abs(timeRemaining - Math.round(timeRemaining)) < 0.05) {
+          playTickSound();
+        }
+      }, 100);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const seconds = Math.ceil(timeRemaining);
+      timerDisplay.textContent = `⏱️ ${seconds}`;
+      timerBar.style.width = `${(timeRemaining / TIME_ATTACK_SECONDS) * 100}%`;
+
+      if (timeRemaining <= 10) {
+        timerDisplay.classList.add('warning');
+        timerBar.classList.add('warning');
+      } else {
+        timerDisplay.classList.remove('warning');
+        timerBar.classList.remove('warning');
+      }
+    }
+
     // ===== Answer Handler =====
     function handleAnswer(selected, btnElement) {
       if (state.isAnswered) return;
+      if (isTimeAttack() && timeRemaining <= 0) return;
       state.isAnswered = true;
 
       const buttons = choicesGrid.querySelectorAll('.choice-btn');
@@ -1678,14 +1836,26 @@
       checkLevelChange(isCorrect);
       updateStreakBadge();
 
+      // タイムアタック: 正解なら即次へ、不正解は短い待ち時間
+      // ふつうモード: 従来通り1.5秒待ち
+      const delay = isTimeAttack() ? (isCorrect ? 300 : 800) : 1500;
+
       setTimeout(() => {
-        state.currentQuestion += 1;
-        if (state.currentQuestion >= TOTAL_QUESTIONS) {
-          showResult();
+        if (isTimeAttack()) {
+          // タイムアタックは時間切れまで無限に出題
+          if (timeRemaining > 0) {
+            state.currentQuestion += 1;
+            nextQuestion();
+          }
         } else {
-          nextQuestion();
+          state.currentQuestion += 1;
+          if (state.currentQuestion >= TOTAL_QUESTIONS) {
+            showResult();
+          } else {
+            nextQuestion();
+          }
         }
-      }, 1500);
+      }, delay);
     }
 
     // ===== UI Update =====
@@ -1701,8 +1871,13 @@
     function updateGameUI() {
       levelBadge.textContent = `レベル ${state.level}`;
       difficultyModeBadge.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
-      progressText.textContent = `${state.currentQuestion + 1} / ${TOTAL_QUESTIONS}`;
-      progressBar.style.width = `${((state.currentQuestion) / TOTAL_QUESTIONS) * 100}%`;
+
+      if (isTimeAttack()) {
+        progressText.textContent = `${state.score} もん せいかい`;
+      } else {
+        progressText.textContent = `${state.currentQuestion + 1} / ${TOTAL_QUESTIONS}`;
+        progressBar.style.width = `${((state.currentQuestion) / TOTAL_QUESTIONS) * 100}%`;
+      }
     }
 
     // ===== Question Flow =====
@@ -1711,7 +1886,13 @@
       feedback.textContent = '';
       feedback.className = 'feedback';
       hintArea.innerHTML = '';
-      hintBtn.style.display = 'inline-block';
+
+      // タイムアタックではヒント非表示
+      if (isTimeAttack()) {
+        hintBtn.style.display = 'none';
+      } else {
+        hintBtn.style.display = 'inline-block';
+      }
 
       updateGameUI();
       updateCharReaction('idle');
@@ -1721,7 +1902,6 @@
       state.operators = q.operators;
       state.correctAnswer = q.answer;
 
-      // 問題文の組み立て
       let questionHTML = `${q.nums[0]}`;
       for (let i = 0; i < q.operators.length; i++) {
         const opSymbol = q.operators[i] === '+' ? '＋' : '−';
@@ -1746,6 +1926,7 @@
 
     // ===== Result Screen =====
     function showResult() {
+      stopTimer();
       showScreen(resultScreen);
 
       if (selectedCharacter) {
@@ -1753,14 +1934,35 @@
       }
 
       finalScore.textContent = state.score;
-      finalDifficulty.textContent = selectedDifficulty === 'hard' ? '🔥 がんばるモード' : '🌸 やさしいモード';
+
+      if (isTimeAttack()) {
+        resultLabel.textContent = 'タイムアップ！';
+        resultTotal.textContent = ' もん せいかい！';
+        finalMode.style.display = 'inline-block';
+        finalMode.textContent = '⏱️ タイムアタック 60びょう';
+      } else {
+        resultLabel.textContent = 'けっか はっぴょう！';
+        resultTotal.textContent = ' / 30';
+        finalMode.style.display = 'inline-block';
+        finalMode.textContent = '📝 ふつうモード';
+      }
+
+      finalDifficulty.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
       finalLevel.textContent = `さいこうレベル: ${state.maxLevel}`;
 
-      const ratio = state.score / TOTAL_QUESTIONS;
+      // 星評価
       let starCount;
-      if (ratio >= 0.9) starCount = 3;
-      else if (ratio >= 0.6) starCount = 2;
-      else starCount = 1;
+      if (isTimeAttack()) {
+        // タイムアタック: 正解数で評価
+        if (state.score >= 20) starCount = 3;
+        else if (state.score >= 10) starCount = 2;
+        else starCount = 1;
+      } else {
+        const ratio = state.score / TOTAL_QUESTIONS;
+        if (ratio >= 0.9) starCount = 3;
+        else if (ratio >= 0.6) starCount = 2;
+        else starCount = 1;
+      }
 
       stars.innerHTML = '';
       for (let i = 0; i < 3; i++) {
@@ -1771,15 +1973,28 @@
       }
 
       const charMsg = selectedCharacter ? getCharSpeech('result') : '';
-      const messages = [
-        'がんばったね！つぎも いっしょに やろう！',
-        'すごい！どんどん できるようになってるよ！',
-        'さんすうマスターに ちかづいてるよ！',
-      ];
-      resultMessage.textContent = charMsg ? `${charMsg} ${messages[starCount - 1]}` : messages[starCount - 1];
 
+      let resultMsgText;
+      if (isTimeAttack()) {
+        const taMessages = [
+          'がんばったね！つぎは もっと とけるよ！',
+          'すごい！どんどん はやくなってるね！',
+          'さんすうスピードマスター！',
+        ];
+        resultMsgText = taMessages[starCount - 1];
+      } else {
+        const messages = [
+          'がんばったね！つぎも いっしょに やろう！',
+          'すごい！どんどん できるようになってるよ！',
+          'さんすうマスターに ちかづいてるよ！',
+        ];
+        resultMsgText = messages[starCount - 1];
+      }
+      resultMessage.textContent = charMsg ? `${charMsg} ${resultMsgText}` : resultMsgText;
+
+      const ratio = isTimeAttack() ? (state.score >= 10 ? 0.7 : 0.3) : state.score / TOTAL_QUESTIONS;
       playResultSound(ratio);
-      if (ratio >= 0.6) {
+      if (ratio >= 0.6 || (isTimeAttack() && state.score >= 10)) {
         launchConfetti();
       }
     }
@@ -1812,6 +2027,12 @@
       showScreen(selectScreen);
     }
 
+    function goToModeSelect() {
+      playButtonSound();
+      initModeSelect();
+      showScreen(modeScreen);
+    }
+
     function goToDifficultySelect() {
       playButtonSound();
       initDifficultySelect();
@@ -1820,16 +2041,32 @@
 
     function startGame() {
       state = createInitialState();
+      stopTimer();
       playButtonSound();
+
+      // UI切り替え
+      if (isTimeAttack()) {
+        timerContainer.style.display = 'block';
+        progressBarContainer.style.display = 'none';
+      } else {
+        timerContainer.style.display = 'none';
+        progressBarContainer.style.display = 'block';
+      }
+
       showScreen(gameScreen);
       nextQuestion();
+
+      if (isTimeAttack()) {
+        startTimer();
+      }
     }
 
     startBtn.addEventListener('click', goToCharacterSelect);
-    selectBtn.addEventListener('click', goToDifficultySelect);
+    selectBtn.addEventListener('click', goToModeSelect);
+    modeBtn.addEventListener('click', goToDifficultySelect);
     difficultyBtn.addEventListener('click', startGame);
     retryBtn.addEventListener('click', startGame);
-    changeDifficultyBtn.addEventListener('click', goToDifficultySelect);
+    changeModeBtn.addEventListener('click', goToModeSelect);
     hintBtn.addEventListener('click', showHint);
   </script>
 </body>
