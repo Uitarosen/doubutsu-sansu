@@ -14,6 +14,10 @@
       padding: 0;
     }
 
+    html {
+      background: linear-gradient(135deg, #FFE4F0 0%, #E8E0FF 50%, #D4F5E9 100%);
+    }
+
     body {
       font-family: 'Kosugi Maru', sans-serif;
       min-height: 100vh;
@@ -21,7 +25,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      overflow-x: hidden;
       position: relative;
     }
 
@@ -60,6 +64,7 @@
       padding: 1.5rem;
       position: relative;
       z-index: 1;
+      margin: auto; /* 中身が画面より高いときも上端が切れない安全なセンタリング */
     }
 
     .screen.active {
@@ -852,6 +857,172 @@
       animation: charHappy 1s ease;
     }
 
+    /* ===== Subtraction Training Visual (さくらんぼ計算 + 10のまとまり) ===== */
+    .sub-visual {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+      animation: speechPop 0.4s ease;
+    }
+
+    .cherry-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cherry-node {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 46px;
+      height: 46px;
+      padding: 0 8px;
+      border-radius: 50%;
+      border: 3px solid #E056A0;
+      background: #FFF0F5;
+      color: #5B3A7A;
+      font-size: 1.3rem;
+      font-weight: bold;
+      transition: opacity 0.4s;
+    }
+
+    .cherry-node.ten-node {
+      border-color: #4D96FF;
+      background: #EEF5FF;
+    }
+
+    .cherry-node.dim {
+      opacity: 0.4;
+    }
+
+    .cherry-node.pop {
+      animation: correctPop 0.5s ease;
+    }
+
+    .cherry-stems {
+      display: block;
+      margin: -2px 0;
+    }
+
+    .cherry-bottom {
+      display: flex;
+      gap: 2.4rem;
+    }
+
+    .sub-groups {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .ten-frame {
+      display: grid;
+      grid-template-columns: repeat(5, 36px);
+      grid-auto-rows: 36px;
+      gap: 3px;
+      border: 3px solid #4D96FF;
+      border-radius: 10px;
+      padding: 5px;
+      background: #F5F9FF;
+    }
+
+    .ten-frame .tf-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 2px dashed #C9DEFF;
+      border-radius: 6px;
+      font-size: 1.3rem;
+    }
+
+    .loose-group {
+      display: grid;
+      grid-template-columns: repeat(3, 36px);
+      grid-auto-rows: 36px;
+      gap: 3px;
+      border: 3px dashed #E056A0;
+      border-radius: 10px;
+      padding: 5px;
+      background: #FFF7FB;
+    }
+
+    .loose-group .tf-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .sub-animal {
+      position: relative;
+      display: inline-block;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .sub-animal.crossed {
+      opacity: 0.4;
+    }
+
+    .sub-animal.crossed::after {
+      content: '\2715';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #E74C3C;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .sub-animal.glow {
+      animation: glowBounce 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes glowBounce {
+      from { transform: scale(1); }
+      to { transform: scale(1.22); filter: drop-shadow(0 0 6px #FFD93D); }
+    }
+
+    .sub-step-text {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #5B3A7A;
+      background: #FFF9E6;
+      border: 2px solid #FFEAA7;
+      border-radius: 14px;
+      padding: 0.5rem 1rem;
+      min-height: 2.4rem;
+      animation: speechPop 0.3s ease;
+    }
+
+    .sub-next-btn {
+      background: linear-gradient(135deg, #FFB6C1, #DDA0DD);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.8rem;
+      font-size: 1.1rem;
+      font-family: 'Kosugi Maru', sans-serif;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(221, 160, 221, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .sub-next-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .sub-next-btn:active {
+      transform: scale(0.95);
+    }
+
     /* ===== Responsive ===== */
     @media (max-width: 480px) {
       .start-title { font-size: 1.8rem; }
@@ -913,7 +1084,7 @@
   <div class="screen" id="modeScreen">
     <div class="card">
       <h2 class="difficulty-title">あそびかたを えらんでね！</h2>
-      <p class="difficulty-subtitle">どっちで あそぶ？</p>
+      <p class="difficulty-subtitle">すきなのを えらんでね！</p>
       <div class="difficulty-options" id="modeOptions">
         <div class="difficulty-card" data-mode="normal">
           <span class="diff-emoji">📝</span>
@@ -924,6 +1095,11 @@
           <span class="diff-emoji">⏱️</span>
           <span class="diff-name">タイムアタック</span>
           <p class="diff-desc">60びょうで なんもん<br>とけるかな？</p>
+        </div>
+        <div class="difficulty-card" data-mode="hikizan">
+          <span class="diff-emoji">🍒</span>
+          <span class="diff-name">ひきざんとっくん</span>
+          <p class="diff-desc">くりさがりの ひきざんを<br>10のまとまりで マスター！</p>
         </div>
       </div>
       <button class="btn-primary" id="modeBtn" disabled>これに する！</button>
@@ -1222,7 +1398,26 @@
       { maxNum: 50,  maxAnswer: 150, ops: ['+', '-'] },
     ];
 
+    // ひきざんとっくん: 繰り下がり(減加法・さくらんぼ計算)を段階的に習得する
+    // subs: 出題する引く数の候補 / type:'ten' は 10−□ / mix は繰り下がり有無の判別練習
+    const LEVEL_CONFIG_SUB = [
+      null,
+      { type: 'ten',                     maxAnswer: 10, range: 3 },
+      { subs: [9],                       maxAnswer: 10, range: 3 },
+      { subs: [8, 9],                    maxAnswer: 10, range: 3 },
+      { subs: [7, 8, 9],                 maxAnswer: 10, range: 3 },
+      { subs: [6, 7, 8, 9],              maxAnswer: 10, range: 3 },
+      { subs: [4, 5, 6, 7, 8, 9],        maxAnswer: 10, range: 3 },
+      { subs: [2, 3, 4, 5, 6, 7, 8, 9],  maxAnswer: 10, range: 3 },
+      { subs: [2, 3, 4, 5, 6, 7, 8, 9],  maxAnswer: 10, range: 2 },
+      { mix: true,                       maxAnswer: 18, range: 3 },
+      { mix: true,                       maxAnswer: 18, range: 2 },
+    ];
+
     function getLevelConfig(level) {
+      if (isHikizan()) {
+        return LEVEL_CONFIG_SUB[level];
+      }
       if (selectedDifficulty === 'hard') {
         return LEVEL_CONFIG_HARD[level];
       }
@@ -1231,6 +1426,10 @@
 
     function isTimeAttack() {
       return selectedMode === 'timeattack';
+    }
+
+    function isHikizan() {
+      return selectedMode === 'hikizan';
     }
 
     // ===== Game State =====
@@ -1473,7 +1672,33 @@
       return { nums: [a, b, c], operators: [op1, op2], answer };
     }
 
+    function generateQuestionSub(level) {
+      const config = LEVEL_CONFIG_SUB[level];
+      let a, b;
+
+      if (config.type === 'ten') {
+        // 10−□ : 10のまとまりから引く基礎
+        a = 10;
+        b = randInt(1, 9);
+      } else if (config.mix && Math.random() < 0.4) {
+        // 繰り下がりなし (一のくらいから そのまま引ける)
+        const ones = randInt(2, 9);
+        a = 10 + ones;
+        b = randInt(1, ones);
+      } else {
+        // 繰り下がりあり: 一のくらい < 引く数 になるように作る
+        const subs = config.subs || [2, 3, 4, 5, 6, 7, 8, 9];
+        b = subs[randInt(0, subs.length - 1)];
+        a = 10 + randInt(1, b - 1);
+      }
+
+      return { nums: [a, b], operators: ['-'], answer: a - b };
+    }
+
     function generateQuestion(level) {
+      if (isHikizan()) {
+        return generateQuestionSub(level);
+      }
       if (selectedDifficulty === 'hard') {
         return generateQuestionHard(level);
       }
@@ -1481,9 +1706,9 @@
     }
 
     // ===== Choices Generation =====
-    function generateChoices(correctAnswer, maxAnswer) {
+    function generateChoices(correctAnswer, maxAnswer, rangeOverride) {
       const choices = new Set([correctAnswer]);
-      const range = maxAnswer <= 10 ? 3 : maxAnswer <= 20 ? 5 : 10;
+      const range = rangeOverride || (maxAnswer <= 10 ? 3 : maxAnswer <= 20 ? 5 : 10);
 
       let attempts = 0;
       while (choices.size < 4 && attempts < 100) {
@@ -1506,8 +1731,235 @@
       return shuffleArray([...choices]);
     }
 
+    // ===== Subtraction Visual (さくらんぼ計算 + 10のまとまり) =====
+    function buildSubVisualDOM(a, b) {
+      hintArea.innerHTML = '';
+      const ones = a - 10;
+      const animal = ANIMALS[randInt(0, ANIMALS.length - 1)];
+
+      const wrap = document.createElement('div');
+      wrap.className = 'sub-visual';
+
+      let topNode = null;
+      let tenNode = null;
+      let onesNode = null;
+
+      if (ones > 0) {
+        const cherry = document.createElement('div');
+        cherry.className = 'cherry-diagram';
+
+        topNode = document.createElement('span');
+        topNode.className = 'cherry-node';
+        topNode.textContent = a;
+
+        const stems = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        stems.setAttribute('class', 'cherry-stems');
+        stems.setAttribute('width', '130');
+        stems.setAttribute('height', '24');
+        [['65', '0', '28', '24'], ['65', '0', '102', '24']].forEach(([x1, y1, x2, y2]) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', x1);
+          line.setAttribute('y1', y1);
+          line.setAttribute('x2', x2);
+          line.setAttribute('y2', y2);
+          line.setAttribute('stroke', '#B08DC5');
+          line.setAttribute('stroke-width', '3');
+          line.setAttribute('stroke-linecap', 'round');
+          stems.appendChild(line);
+        });
+
+        tenNode = document.createElement('span');
+        tenNode.className = 'cherry-node ten-node';
+        tenNode.textContent = '10';
+
+        onesNode = document.createElement('span');
+        onesNode.className = 'cherry-node';
+        onesNode.textContent = ones;
+
+        const bottom = document.createElement('div');
+        bottom.className = 'cherry-bottom';
+        bottom.appendChild(tenNode);
+        bottom.appendChild(onesNode);
+
+        cherry.appendChild(topNode);
+        cherry.appendChild(stems);
+        cherry.appendChild(bottom);
+        wrap.appendChild(cherry);
+      }
+
+      const groups = document.createElement('div');
+      groups.className = 'sub-groups';
+
+      const frame = document.createElement('div');
+      frame.className = 'ten-frame';
+      const frameAnimals = [];
+      for (let i = 0; i < 10; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'tf-cell';
+        const span = document.createElement('span');
+        span.className = 'sub-animal';
+        span.textContent = animal;
+        cell.appendChild(span);
+        frame.appendChild(cell);
+        frameAnimals.push(span);
+      }
+      groups.appendChild(frame);
+
+      const looseAnimals = [];
+      if (ones > 0) {
+        const loose = document.createElement('div');
+        loose.className = 'loose-group';
+        for (let i = 0; i < ones; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'tf-cell';
+          const span = document.createElement('span');
+          span.className = 'sub-animal';
+          span.textContent = animal;
+          cell.appendChild(span);
+          loose.appendChild(cell);
+          looseAnimals.push(span);
+        }
+        groups.appendChild(loose);
+      }
+      wrap.appendChild(groups);
+
+      const stepText = document.createElement('div');
+      stepText.className = 'sub-step-text';
+      wrap.appendChild(stepText);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'sub-next-btn';
+      nextBtn.style.display = 'none';
+      wrap.appendChild(nextBtn);
+
+      hintArea.appendChild(wrap);
+      return { wrap, topNode, tenNode, onesNode, frameAnimals, looseAnimals, stepText, nextBtn };
+    }
+
+    function crossOutAnimals(animals, count) {
+      const total = animals.length;
+      for (let i = 0; i < count; i++) {
+        const idx = total - 1 - i;
+        setTimeout(() => {
+          animals[idx].classList.add('crossed');
+          playTone(560 - i * 25, 0.08, 'sine', 0.08);
+        }, i * 180);
+      }
+    }
+
+    function splitCherry(els) {
+      if (!els.topNode) return;
+      els.topNode.classList.add('dim');
+      els.tenNode.classList.add('pop');
+      els.onesNode.classList.add('pop');
+    }
+
+    // mode: 'hint' = 自分のペースで進め、答えは見せない / 'teach' = 自動再生で答えまで見せる
+    function buildSubSteps(a, b, mode) {
+      const ones = a - 10;
+      const answer = a - b;
+      const rest = 10 - b;
+
+      if (a === 10) {
+        return [
+          { text: '10 の まとまりが あるよ！', run: () => {} },
+          { text: `10 から ${b} を ひくよ！`, run: (els) => crossOutAnimals(els.frameAnimals, b) },
+          mode === 'hint'
+            ? { text: 'のこりは いくつかな？', run: (els) => els.frameAnimals.slice(0, answer).forEach(s => s.classList.add('glow')) }
+            : { text: `のこりは ${answer}！ こたえは ${answer} だよ！`, run: (els) => els.frameAnimals.slice(0, answer).forEach(s => s.classList.add('glow')) },
+        ];
+      }
+
+      if (b > ones) {
+        // 繰り下がりあり: 減加法
+        return [
+          { text: `${a} を 10 と ${ones} に わけるよ！`, run: (els) => splitCherry(els) },
+          { text: `10 の まとまりから ${b} を ひくよ！ 10−${b}＝${rest}`, run: (els) => crossOutAnimals(els.frameAnimals, b) },
+          { text: `のこった ${rest} と ${ones} を あわせよう！`, run: (els) => {
+              els.frameAnimals.slice(0, rest).forEach(s => s.classList.add('glow'));
+              els.looseAnimals.forEach(s => s.classList.add('glow'));
+            } },
+          mode === 'hint'
+            ? { text: `${rest} と ${ones} で いくつに なるかな？`, run: () => {} }
+            : { text: `${rest}＋${ones}＝${answer}！ こたえは ${answer} だよ！`, run: () => {} },
+        ];
+      }
+
+      // 繰り下がりなし: 一のくらいから そのまま引ける
+      return [
+        { text: `${a} を 10 と ${ones} に わけるよ！`, run: (els) => splitCherry(els) },
+        { text: `${ones} から ${b} が そのまま ひけるね！ ${ones}−${b}＝${ones - b}`, run: (els) => crossOutAnimals(els.looseAnimals, b) },
+        mode === 'hint'
+          ? { text: `10 と ${ones - b} で いくつかな？`, run: (els) => {
+              els.frameAnimals.forEach(s => s.classList.add('glow'));
+              els.looseAnimals.slice(0, ones - b).forEach(s => s.classList.add('glow'));
+            } }
+          : { text: `10 と ${ones - b} で ${answer}！ こたえは ${answer} だよ！`, run: (els) => {
+              els.frameAnimals.forEach(s => s.classList.add('glow'));
+              els.looseAnimals.slice(0, ones - b).forEach(s => s.classList.add('glow'));
+            } },
+      ];
+    }
+
+    function startSubWalkthrough(mode, onDone) {
+      hintBtn.style.display = 'none';
+      const a = state.nums[0];
+      const b = state.nums[1];
+      const els = buildSubVisualDOM(a, b);
+      const steps = buildSubSteps(a, b, mode);
+      let index = -1;
+
+      // ビジュアルが画面外に隠れないようスクロール
+      setTimeout(() => {
+        els.wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 150);
+
+      function showStep() {
+        index += 1;
+        const step = steps[index];
+        els.stepText.textContent = step.text;
+        els.stepText.style.animation = 'none';
+        void els.stepText.offsetWidth;
+        els.stepText.style.animation = '';
+        step.run(els);
+
+        const isLast = index >= steps.length - 1;
+        if (mode === 'hint') {
+          if (isLast) {
+            els.nextBtn.style.display = 'none';
+          } else {
+            els.nextBtn.textContent = 'つぎへ ▶';
+            els.nextBtn.style.display = 'inline-block';
+          }
+        } else if (isLast) {
+          if (onDone) {
+            els.nextBtn.textContent = 'わかった！ つぎへ ▶';
+            els.nextBtn.style.display = 'inline-block';
+          }
+        } else {
+          setTimeout(showStep, 2300);
+        }
+      }
+
+      els.nextBtn.addEventListener('click', () => {
+        playButtonSound();
+        if (mode === 'hint') {
+          showStep();
+        } else if (onDone) {
+          els.nextBtn.disabled = true;
+          onDone();
+        }
+      });
+
+      showStep();
+    }
+
     // ===== Hint Display =====
     function showHint() {
+      if (isHikizan()) {
+        startSubWalkthrough('hint', null);
+        return;
+      }
       hintBtn.style.display = 'none';
       hintArea.innerHTML = '';
 
@@ -1836,6 +2288,21 @@
       checkLevelChange(isCorrect);
       updateStreakBadge();
 
+      // ひきざんとっくん: 間違えたら解き方を自動再生し、「わかった！」で次へ
+      if (isHikizan() && !isCorrect) {
+        setTimeout(() => {
+          startSubWalkthrough('teach', () => {
+            state.currentQuestion += 1;
+            if (state.currentQuestion >= TOTAL_QUESTIONS) {
+              showResult();
+            } else {
+              nextQuestion();
+            }
+          });
+        }, 900);
+        return;
+      }
+
       // タイムアタック: 正解なら即次へ、不正解は短い待ち時間
       // ふつうモード: 従来通り1.5秒待ち
       const delay = isTimeAttack() ? (isCorrect ? 300 : 800) : 1500;
@@ -1870,7 +2337,7 @@
 
     function updateGameUI() {
       levelBadge.textContent = `レベル ${state.level}`;
-      difficultyModeBadge.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
+      difficultyModeBadge.textContent = isHikizan() ? '🍒 ひきざん' : (selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい');
 
       if (isTimeAttack()) {
         progressText.textContent = `${state.score} もん せいかい`;
@@ -1886,11 +2353,14 @@
       feedback.textContent = '';
       feedback.className = 'feedback';
       hintArea.innerHTML = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
 
       // タイムアタックではヒント非表示
       if (isTimeAttack()) {
         hintBtn.style.display = 'none';
       } else {
+        hintBtn.textContent = isHikizan() ? '🍒 おしえて！' : '💡 ヒント';
         hintBtn.style.display = 'inline-block';
       }
 
@@ -1911,7 +2381,7 @@
       questionText.innerHTML = questionHTML;
 
       const config = getLevelConfig(state.level);
-      const choices = generateChoices(q.answer, config.maxAnswer);
+      const choices = generateChoices(q.answer, config.maxAnswer, config.range);
 
       choicesGrid.innerHTML = '';
       choices.forEach(val => {
@@ -1944,10 +2414,15 @@
         resultLabel.textContent = 'けっか はっぴょう！';
         resultTotal.textContent = ' / 30';
         finalMode.style.display = 'inline-block';
-        finalMode.textContent = '📝 ふつうモード';
+        finalMode.textContent = isHikizan() ? '🍒 ひきざん とっくん' : '📝 ふつうモード';
       }
 
-      finalDifficulty.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
+      if (isHikizan()) {
+        finalDifficulty.style.display = 'none';
+      } else {
+        finalDifficulty.style.display = 'inline-block';
+        finalDifficulty.textContent = selectedDifficulty === 'hard' ? '🔥 がんばる' : '🌸 やさしい';
+      }
       finalLevel.textContent = `さいこうレベル: ${state.maxLevel}`;
 
       // 星評価
@@ -2063,7 +2538,14 @@
 
     startBtn.addEventListener('click', goToCharacterSelect);
     selectBtn.addEventListener('click', goToModeSelect);
-    modeBtn.addEventListener('click', goToDifficultySelect);
+    modeBtn.addEventListener('click', () => {
+      // ひきざんとっくんは むずかしさ選択なしで すぐスタート
+      if (isHikizan()) {
+        startGame();
+      } else {
+        goToDifficultySelect();
+      }
+    });
     difficultyBtn.addEventListener('click', startGame);
     retryBtn.addEventListener('click', startGame);
     changeModeBtn.addEventListener('click', goToModeSelect);
